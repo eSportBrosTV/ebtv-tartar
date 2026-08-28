@@ -1,0 +1,17 @@
+const express = require('express')
+
+const validateBody = require('../middlewares/validateBody')
+const { user } = require('../schemas')
+const authCtrl = require('../controllers/authCtrl')
+const passport = require('passport')
+const auth = require('../middlewares/auth')
+
+const authRouter = express.Router()
+
+authRouter.post("/register", validateBody(user.create), auth, authCtrl.register)
+authRouter.post("/login", validateBody(user.login), passport.authenticate('local'), authCtrl.login)
+
+authRouter.post("/logout", auth, authCtrl.logout)
+authRouter.get("/me", auth, authCtrl.me)
+
+module.exports = authRouter
