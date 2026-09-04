@@ -1,3 +1,4 @@
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 const inject = (configs) => catchAsync(async (req, res, next) => {
@@ -10,9 +11,7 @@ const inject = (configs) => catchAsync(async (req, res, next) => {
         const doc = await config.model.findById(id);
 
         if (!doc) {
-            const err = new Error(`Ressource introuvable pour le parametre: ${config.param}`);
-            err.statusCode = 404;
-            throw err;
+            throw new AppError(`Ressource introuvable`, 404);
         }
 
         return { key: config.key, doc: doc };

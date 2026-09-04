@@ -1,11 +1,10 @@
 const catchAsync = require("../utils/catchAsync")
 const { User } = require("../models")
+const AppError = require("../utils/appError")
 
 const register = catchAsync(async (req,res,next) => {
     if(!req.user.roles.includes("admin")){
-        const err = new Error("Acces refusé")
-        err.statusCode = 401
-        throw err
+        throw new AppError("Acces refuser", 403)
     }
 
     let newUser = await User.create(req.body)

@@ -17,6 +17,48 @@ botRouter.get("/", auth, isAdmin, botCtrl.getBots);
 botRouter.get("/:idbot", setFilters({ _id: "idbot" }), botCtrl.getBot);
 
 botRouter.post("/", validateBody(bot.create), botCtrl.addBot);
+botRouter.post(
+  "/:idbot/start",
+  auth,
+  isAdmin,
+  inject([
+    {
+      model: Bot,
+      param: "idbot",
+      key: "bot"
+    }
+  ]),
+  botCtrl.startBot
+);
+
+botRouter.post(
+  "/:idbot/stop",
+  auth,
+  isAdmin,
+  inject([
+    {
+      model: Bot,
+      param: "idbot",
+      key: "bot"
+    }
+  ]),
+  botCtrl.stopBot
+);
+
+botRouter.delete(
+  "/:idbot/kill",
+  auth,
+  isAdmin,
+  inject([
+    {
+      model: Bot,
+      param: "idbot",
+      key: "bot"
+    }
+  ]),
+  validateBody(bot.destroy),
+  botCtrl.destroyBot
+)
 
 botRouter.post(
   "/:idbot/command",

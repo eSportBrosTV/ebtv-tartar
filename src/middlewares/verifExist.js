@@ -1,3 +1,4 @@
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 const verifExist = (configs) => catchAsync(async (req, res, next) => {
@@ -10,9 +11,7 @@ const verifExist = (configs) => catchAsync(async (req, res, next) => {
         const isExist = await config.model.exists({_id: id});
 
         if (!isExist) {
-            const err = new Error(`Ressource introuvable pour le parametre: ${config.param}`);
-            err.statusCode = 404;
-            throw err;
+            throw new AppError("Ressource introuvable", 404)
         }
     });
 

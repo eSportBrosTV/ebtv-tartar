@@ -1,10 +1,9 @@
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 module.exports = catchAsync((req,res,next) => {
     if(req.user.roles != 'admin') {
-        const err = new Error("Acces refuse");
-        err.statusCode = 401;
-        throw err;
+        throw new AppError("Acces refuser", 403)
     }
 
     next()

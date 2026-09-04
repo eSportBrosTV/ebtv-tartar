@@ -28,8 +28,8 @@ const startApp = async () => {
       console.log("[Server] Tartar est en ligne");
     });
   } catch (error) {
-    console.error("[Server] Erreur au demarage", error)
-    process.exit(1)
+    console.error("[Server] Erreur au demarage", error);
+    process.exit(1);
   }
 };
 

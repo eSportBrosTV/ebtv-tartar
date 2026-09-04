@@ -40,12 +40,6 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-
-//routes
-app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'Manager Orca en ligne et opérationnel 🚀' });
-});
-
 app.use('/orga', orgaRouter)
 app.use('/commands', commandsRouter)
 app.use('/bot', botRouter)

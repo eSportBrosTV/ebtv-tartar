@@ -1,4 +1,5 @@
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('./appError');
 
 exports.createOne = (Model) => catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body);
@@ -35,7 +36,7 @@ exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) =
     const doc = await query;
 
     if (!doc) {
-        throw Object.assign(new Error('Aucun document trouver avec cet ID (ou acces refuse)'), { statusCode: 404 });
+        throw new AppError("Ressource introuvable", 404)
     }
 
     res.status(200).json({
@@ -57,7 +58,7 @@ exports.updateOne = (Model) => catchAsync(async (req, res, next) => {
         runValidators: true
     });
 
-    if (!doc) throw Object.assign(new Error('Aucun document trouve'), { statusCode: 404 });
+    if (!doc) throw new AppError("Ressource introuvable", 404)
 
     res.status(200).json({ status: 'success', data: doc });
 });
@@ -72,7 +73,7 @@ exports.deleteOne = (Model) => catchAsync(async (req, res, next) => {
     const doc = await Model.findOneAndDelete(queryFilter);
 
     if (!doc) {
-        throw Object.assign(new Error('Aucun document trouve avec cet ID (ou acces refuse)'), { statusCode: 404 });
+        throw new AppError("Ressource introuvable", 404)
     }
 
     res.status(204).json({
