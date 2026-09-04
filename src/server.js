@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 const app = require("./config/app");
 const socket = require("./config/socket");
 const { connectDB } = require("./config/db");
+const { connectDocker } = require("./config/docker");
 
 const shutdownProccess = require("./utils/shutdownProccess");
 
@@ -18,6 +19,8 @@ process.on("SIGINT", shutdownProccess);
 const startApp = async () => {
   try {
     await connectDB();
+
+    await connectDocker();
 
     socket.init(server);
 

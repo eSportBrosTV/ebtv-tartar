@@ -6,7 +6,7 @@ const { configGenerator } = require("../services/configGenerator");
 const dockerService = require("../services/dockerService");
 const AppError = require("../utils/appError");
 
-async function emitStopAndWait(botId, force=false) {
+async function emitStopAndWait(botId, force = false) {
   let botRep = null;
 
   try {
@@ -30,14 +30,23 @@ async function emitStopAndWait(botId, force=false) {
 }
 
 const addBot = catchAsync(async (req, res, next) => {
-  const newBot = await Bot.create(req.body);
+  const newBot = new Bot(req.body);
 
-  let container = await dockerService.startBot(newBot.id)
+  let newContainerId = await dockerService.createContainer({
+    botId: newBot.id,
+    orga: newBot.orga,
+    token: newBot.token,
+  });
 
-  newBot.containerId = container
+  newBot.containerId = newContainerId;
+
+  await newBot.save();
+
+  let isStarted = await dockerService.startContainer(newContainerId);
 
   res.status(201).json({
-    status: "success",
+    status: isStarted ? "success" : "partial",
+    message: isStarted ? "Bot creer et demarer" : "Bot creer mais non demarer",
     data: newBot,
   });
 });
@@ -70,36 +79,44 @@ const addCommandToBot = catchAsync(async (req, res, next) => {
 const updateBotCommand = catchAsync(async (req, res, next) => {});
 
 const startBot = catchAsync(async (req, res, next) => {
-  const result = await dockerService.startBot(req.bot.id);
+  const containerId = req.bot.containerId;
+
+  if (!(await dockerService.checkContainerExist(containerId))) {
+    throw new AppError(`Le conteneur du bot ${bot.id} n'existe pas`, 404);
+  }
+
+  if (!(await dockerService.startContainer(containerId))) {
+    throw new AppError(`Impossible de demarer le bot`, 500);
+  }
 
   res.status(200).json({
     status: "succes",
-    data: {
-      containerId: result,
-    },
+    message: "Bot demarer",
   });
 });
 
 const stopBot = catchAsync(async (req, res, next) => {
   const bot = req.bot;
 
-  await emitStopAndWait(bot.id)
+  await emitStopAndWait(bot.id);
 
-  const result = await dockerService.stopBot(req.bot.id);
+  if (!(await dockerService.stopContainer(bot.containerId))) {
+    throw new AppError(`Arret impossible`, 500);
+  }
 
   res.status(200).json({
     status: "success",
-    message: result,
+    message: "Bot stopper",
   });
 });
 
 const destroyBot = catchAsync(async (req, res, next) => {
   const bot = req.bot;
 
-  await emitStopAndWait(bot.id, req.body.force)
+  await emitStopAndWait(bot.id, req.body.force);
 
-  if (!(await dockerService.destroyBotContainer(bot.id))) {
-    throw new AppError("Impossible de detruir le bot", 500);
+  if (!(await dockerService.destroyContainer(bot.containerId))) {
+    throw new AppError("Impossible de detruir le conteneur du bot", 500);
   }
 
   await bot.deleteOne();
