@@ -2,8 +2,10 @@ const { Bot } = require("../../models");
 const { handleDeployementDone, handleConfigRequest } = require("./controllers/botEventsCtrl");
 const { handleDisconect, setOnlineStatus } = require("./controllers/connectEventsCtrl");
 const botAuthSocket = require("./middlewares/botAuthSocket");
+const isHealthConnect = require("./middlewares/isHealthConnect");
 
 module.exports = (io) => {
+  io.use(isHealthConnect)
   io.use(botAuthSocket);
 
   io.on("connection", (socket) => {

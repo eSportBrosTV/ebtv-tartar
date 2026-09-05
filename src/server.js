@@ -10,6 +10,8 @@ const { connectDB } = require("./config/db");
 const { connectDocker } = require("./config/docker");
 
 const shutdownProccess = require("./utils/shutdownProccess");
+const healthMonitor = require("./services/healthMonitor");
+const healthProccess = require("./utils/healthProccess");
 
 const server = http.createServer(app);
 
@@ -26,6 +28,10 @@ const startApp = async () => {
 
     await Bot.updateMany({}, { isOnline: false });
     console.log("[Server] Statut des bot initialiser");
+
+    healthMonitor.startMonitoring()
+    healthMonitor.on('status_changed', healthProccess)
+    console.log("[Server] Monitoring lancer")
 
     server.listen(PORT, () => {
       console.log("[Server] Tartar est en ligne");

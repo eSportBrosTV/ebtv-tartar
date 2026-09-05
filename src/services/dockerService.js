@@ -3,6 +3,28 @@ const { docker } = require("../config/docker");
 const env = process.env.ENVEX;
 
 const dockerService = {
+  async getContainers() {
+    try {
+      const containers = await docker.listContainers({
+        all: true,
+        filters: {
+          name: ["bot_"],
+        },
+      });
+
+      let finalContainers = [];
+
+      for (let container of containers) {
+        finalCOntainers.push(docker.getContainer(container.Id));
+      }
+
+      return finalContainers;
+    } catch (err) {
+      console.error("Erreur de recup des conteneur", err.message);
+      return [];
+    }
+  },
+
   async createContainer({ botId, token, orga }) {
     const imageToUse =
       env === "dev" ? "node:20-alpine" : process.env.BOT_IMAGE_PROD;

@@ -10,6 +10,8 @@ const botRouter = require('../routes/bot');
 const { default: MongoStore } = require('connect-mongo');
 const passport = require('passport');
 const authRouter = require('../routes/auth');
+const isHealthyConnect = require('../middlewares/isHealthyConnect');
+const healthRouter = require('../routes/health');
 
 const app = express();
 
@@ -21,6 +23,9 @@ app.use(cors({
     origin: '*',
     credentials: true
 }))
+
+app.use('/health', healthRouter)
+app.use(isHealthyConnect)
 
 app.use(session({
     secret: process.env.SESSION_KEY,
