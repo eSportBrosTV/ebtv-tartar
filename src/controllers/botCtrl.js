@@ -5,6 +5,7 @@ const { getIO } = require("../config/socket");
 const { configGenerator } = require("../services/configGenerator");
 const dockerService = require("../services/dockerService");
 const AppError = require("../utils/appError");
+const jwt = require("jsonwebtoken")
 
 async function emitStopAndWait(botId, force = false) {
   let botRep = null;
@@ -32,10 +33,18 @@ async function emitStopAndWait(botId, force = false) {
 const addBot = catchAsync(async (req, res, next) => {
   const newBot = new Bot(req.body);
 
+  const botJwt = jwt.sign(
+    {
+      orca_id: newBot.id,
+      created_at: Date.now()
+    },
+    process.env.JWT_SECRET
+  )
+
   let newContainerId = await dockerService.createContainer({
     botId: newBot.id,
-    orga: newBot.orga,
-    token: newBot.token,
+    tartarToken: botJwt,
+    disToken: newBot.token
   });
 
   newBot.containerId = newContainerId;

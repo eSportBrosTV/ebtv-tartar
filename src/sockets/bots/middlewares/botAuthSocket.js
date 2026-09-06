@@ -1,12 +1,21 @@
-module.exports = async (socket, next) => {
-    const auth = socket.handshake.auth;
+const jwt = require("jsonwebtoken")
 
-    if (!auth || !auth.orcaId) {
+module.exports = async (socket, next) => {
+    const token = socket.handshake.auth.token;
+
+    if (!token) {
       console.log(
-        `[Socket] Connexion refuser : ID d'organisation manquant.`
+        `[Socket] Connexion refuser : Token manquant.`
       );
-      return next(new Error("Authentification echouee : orgId requis"));
+      return next(new Error("Authentification echouee : Token requis"));
     }
-    socket.orcaId = auth.orcaId;
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      socket.orcaId = decoded.orca_id
+    } catch (error) {
+      return next(new Error("Acces refuse : Token corrompu ou invalide"));
+    }
+    
     next(); 
 }

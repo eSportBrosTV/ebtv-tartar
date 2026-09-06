@@ -25,7 +25,7 @@ const dockerService = {
     }
   },
 
-  async createContainer({ botId, token, orga }) {
+  async createContainer({ tartarToken, disToken, botId}) {
     const imageToUse =
       env === "dev" ? "node:20-alpine" : process.env.BOT_IMAGE_PROD;
     const binds = env === "dev" ? [`${process.env.LOCAL_BOT_PATH}:/app`] : [];
@@ -42,9 +42,8 @@ const dockerService = {
       Image: imageToUse,
       name: `bot_${botId}`,
       Env: [
-        `ORCA_ID=${botId}`,
-        `ORG_ID=${orga}`,
-        `TOKEN=${token}`,
+        `TARTAR_TOKEN=${tartarToken}`,
+        `DIS_TOKEN=${disToken}`,
         `MANAGER_URL=${managerURL}`,
       ],
       HostConfig: { Binds: binds, Memory: 256 * 1024 * 1024 },
