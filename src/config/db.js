@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+mongoose.set('toJSON', {
+    transform: (doc, ret) => {
+        const { _id, __v, ...rest } = ret;
+        
+        return { 
+            id: _id, 
+            ...rest 
+        };
+    }
+})
+
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_LINK, {});
