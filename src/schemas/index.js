@@ -3,7 +3,8 @@ module.exports = {
         create: require("./command/create")
     },
     orga: {
-        create: require("./orga/create")
+        create: require("./orga/create"),
+        addMember: require("./orga/addMember")
     },
     bot: {
         create: require("./bot/create"),
