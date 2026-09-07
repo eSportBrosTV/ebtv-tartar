@@ -14,9 +14,10 @@ const isAdmin = require("../middlewares/isAdmin");
 const botRouter = express.Router();
 
 botRouter.get("/", auth, isAdmin, botCtrl.getBots);
-botRouter.get("/:idbot", setFilters({ _id: "idbot" }), botCtrl.getBot);
+botRouter.get("/:idbot", auth, setFilters({ _id: "idbot" }), botCtrl.getBot);
 
-botRouter.post("/", validateBody(bot.create), botCtrl.addBot);
+botRouter.post("/",auth, isAdmin, validateBody(bot.create), botCtrl.addBot);
+
 botRouter.post(
   "/:idbot/start",
   auth,
