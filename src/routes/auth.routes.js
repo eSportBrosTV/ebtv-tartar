@@ -2,7 +2,7 @@ const express = require('express')
 
 const validateBody = require('../middlewares/validateBody')
 const { user } = require('../schemas')
-const authCtrl = require('../controllers/authCtrl')
+const authCtrl = require('../controllers/auth.controller')
 const passport = require('passport')
 const auth = require('../middlewares/auth')
 

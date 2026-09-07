@@ -1,6 +1,6 @@
 const express = require("express");
 
-const botCtrl = require("../controllers/botCtrl");
+const botCtrl = require("../controllers/bot.controller");
 const { commands, bot } = require("../schemas");
 const validateBody = require("../middlewares/validateBody");
 const setFilters = require("../middlewares/setFilters");

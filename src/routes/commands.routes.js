@@ -1,6 +1,6 @@
 const express = require('express')
 
-const commandsCtrl = require("../controllers/commandsCtrl")
+const commandsCtrl = require("../controllers/command.controller")
 const { commands } = require('../schemas')
 const validateBody = require('../middlewares/validateBody')
 const auth = require('../middlewares/auth')

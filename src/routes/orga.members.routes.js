@@ -1,7 +1,7 @@
 const express = require("express");
 
 const validateBody = require("../middlewares/validateBody");
-const orgaCtrl = require("../controllers/orgaCtrl");
+const orgaCtrl = require("../controllers/orga.controller");
 const uninmplemented = require("../middlewares/uninmplemented");
 
 const membersRouter = express.Router({ mergeParams: true });
