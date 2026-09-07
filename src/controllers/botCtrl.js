@@ -5,7 +5,8 @@ const { getIO } = require("../config/socket");
 const { configGenerator } = require("../services/configGenerator");
 const dockerService = require("../services/dockerService");
 const AppError = require("../utils/appError");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const ApiResponse = require("../utils/ApiResponse");
 
 async function emitStopAndWait(botId, force = false) {
   let botRep = null;
@@ -36,15 +37,15 @@ const addBot = catchAsync(async (req, res, next) => {
   const botJwt = jwt.sign(
     {
       orca_id: newBot.id,
-      created_at: Date.now()
+      created_at: Date.now(),
     },
     process.env.JWT_SECRET
-  )
+  );
 
   let newContainerId = await dockerService.createContainer({
     botId: newBot.id,
     tartarToken: botJwt,
-    disToken: newBot.token
+    disToken: newBot.token,
   });
 
   newBot.containerId = newContainerId;
@@ -53,11 +54,19 @@ const addBot = catchAsync(async (req, res, next) => {
 
   let isStarted = await dockerService.startContainer(newContainerId);
 
-  res.status(201).json({
-    status: isStarted ? "success" : "partial",
-    message: isStarted ? "Bot creer et demarer" : "Bot creer mais non demarer",
-    data: newBot,
-  });
+  if (isStarted) {
+    ApiResponse.created(res, newBot, "Bot creer et demarer");
+  } else {
+    const response = new ApiResponse(
+      res,
+      201,
+      newBot,
+      "Bot creer mais non demarer"
+    );
+    response.payload.status = "partial";
+
+    response.send();
+  }
 });
 
 const addCommandToBot = catchAsync(async (req, res, next) => {
@@ -79,10 +88,7 @@ const addCommandToBot = catchAsync(async (req, res, next) => {
 
   getIO().of("/bots").to(orcaId).emit("update_config", newConf);
 
-  res.status(201).json({
-    status: "success",
-    data: newCommandBot,
-  });
+  ApiResponse.created(res, newCommandBot);
 });
 
 const updateBotCommand = catchAsync(async (req, res, next) => {});
@@ -98,10 +104,7 @@ const startBot = catchAsync(async (req, res, next) => {
     throw new AppError(`Impossible de demarer le bot`, 500);
   }
 
-  res.status(200).json({
-    status: "succes",
-    message: "Bot demarer",
-  });
+  ApiResponse.ok(res, null, "Bot demarer");
 });
 
 const stopBot = catchAsync(async (req, res, next) => {
@@ -113,10 +116,7 @@ const stopBot = catchAsync(async (req, res, next) => {
     throw new AppError(`Arret impossible`, 500);
   }
 
-  res.status(200).json({
-    status: "success",
-    message: "Bot stopper",
-  });
+  ApiResponse.ok(res, null, "Bot stopper");
 });
 
 const destroyBot = catchAsync(async (req, res, next) => {
@@ -130,10 +130,7 @@ const destroyBot = catchAsync(async (req, res, next) => {
 
   await bot.deleteOne();
 
-  res.status(200).json({
-    status: "succes",
-    message: "Bot supprimer avec succer",
-  });
+  ApiResponse.ok(res, null, "Bot supprimer avec succer")
 });
 
 module.exports = {

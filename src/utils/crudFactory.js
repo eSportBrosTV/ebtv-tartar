@@ -1,13 +1,11 @@
 const catchAsync = require('../utils/catchAsync');
+const ApiResponse = require('./ApiResponse');
 const AppError = require('./appError');
 
 exports.createOne = (Model) => catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body);
 
-    res.status(201).json({
-        status: 'success',
-        data: doc
-    });
+    ApiResponse.created(res, doc)
 });
 
 exports.getAll = (Model) => catchAsync(async (req, res, next) => {
@@ -15,11 +13,7 @@ exports.getAll = (Model) => catchAsync(async (req, res, next) => {
     
     const docs = await Model.find(filter);
 
-    res.status(200).json({
-        status: 'success',
-        results: docs.length,
-        data: docs
-    });
+    ApiResponse.ok(res, docs)
 });
 
 exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) => {
@@ -39,10 +33,7 @@ exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) =
         throw new AppError("Ressource introuvable", 404)
     }
 
-    res.status(200).json({
-        status: 'success',
-        data: doc
-    });
+    ApiResponse.ok(res, doc)
 });
 
 exports.updateOne = (Model) => catchAsync(async (req, res, next) => {
@@ -60,7 +51,7 @@ exports.updateOne = (Model) => catchAsync(async (req, res, next) => {
 
     if (!doc) throw new AppError("Ressource introuvable", 404)
 
-    res.status(200).json({ status: 'success', data: doc });
+    ApiResponse.ok(res, doc)
 });
 
 exports.deleteOne = (Model) => catchAsync(async (req, res, next) => {
@@ -76,8 +67,5 @@ exports.deleteOne = (Model) => catchAsync(async (req, res, next) => {
         throw new AppError("Ressource introuvable", 404)
     }
 
-    res.status(204).json({
-        status: 'success',
-        data: null 
-    });
+    ApiResponse.ok(res)
 });
