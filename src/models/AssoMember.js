@@ -1,14 +1,15 @@
 const mongoose = require("mongoose");
+const foreignKeyPlugin = require("../utils/foreignKeyPlugin");
 
 const assoMemberShecma = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
+    ref: "User",
     required: true
   },
   orga: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "orga",
+    ref: "Orga",
     required: true
   },
   role: {
@@ -26,5 +27,7 @@ const assoMemberShecma = new mongoose.Schema({
 
 
 assoMemberShecma.index({user: 1, orga: 1}, {unique: true})
+
+foreignKeyPlugin(assoMemberShecma)
 
 module.exports = mongoose.model("AssoMember", assoMemberShecma, "asso_member");

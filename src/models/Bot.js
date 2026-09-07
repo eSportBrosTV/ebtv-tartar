@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 const { type, required } = require("../schemas/command/create");
+const foreignKeyPlugin = require("../utils/foreignKeyPlugin");
 
 const botSchema = new mongoose.Schema({
   orga: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "orga",
+    ref: "Orga",
   },
   token: {
     type: String,
@@ -54,5 +55,7 @@ botSchema.pre('deleteMany', async function() {
   const docs = await this.model.find(this.getQuery());
   await cleanUpBotData(docs.map(d => d._id), this);
 });
+
+foreignKeyPlugin(botSchema)
 
 module.exports = mongoose.model("Bot", botSchema, "bot");

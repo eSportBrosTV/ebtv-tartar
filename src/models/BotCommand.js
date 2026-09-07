@@ -1,14 +1,15 @@
 const mongoose = require("mongoose");
+const foreignKeyPlugin = require("../utils/foreignKeyPlugin");
 
 const botCommandSchema = new mongoose.Schema(
   {
     bot_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'bot'
+        ref: 'Bot'
     },
     command_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'command',
+        ref: 'Command',
         required: true
     },
     active: {
@@ -22,5 +23,7 @@ const botCommandSchema = new mongoose.Schema(
     }
   }
 );
+
+foreignKeyPlugin(botCommandSchema)
 
 module.exports = mongoose.model("BotCommand", botCommandSchema, "bot_command");
