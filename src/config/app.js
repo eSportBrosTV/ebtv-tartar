@@ -4,13 +4,12 @@ const session = require('express-session')
 
 const { default: MongoStore } = require('connect-mongo');
 const passport = require('passport');
-const isHealthyConnect = require('../middlewares/isHealthyConnect');
 
 const healthRouter = require('../routes/health.routes');
 
 const routes = require('../routes');
 
-const errorHadler = require('../middlewares/errorHadler');
+const { isHealthyConnect, errorHandler } = require('../middlewares');
 
 const app = express();
 
@@ -46,6 +45,6 @@ app.use(passport.session())
 
 app.use(routes)
 
-app.use(errorHadler)
+app.use(errorHandler)
 
 module.exports = app;

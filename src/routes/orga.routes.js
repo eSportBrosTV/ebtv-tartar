@@ -1,13 +1,11 @@
 const express = require("express");
 
 const orgaCtrl = require("../controllers/orga.controller");
-const validateBody = require("../middlewares/validateBody");
 const { orga } = require("../schemas");
-const isAdmin = require("../middlewares/isAdmin");
-const auth = require("../middlewares/auth");
-const verifExist = require("../middlewares/verifExist");
 const { Orga } = require("../models");
+
 const membersRouter = require("./orga.members.routes");
+const { auth, isAdmin, validateBody, verifExist } = require("../middlewares");
 
 const orgaRouter = express.Router();
 

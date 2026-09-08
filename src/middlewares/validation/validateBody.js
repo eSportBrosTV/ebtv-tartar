@@ -1,4 +1,4 @@
-const AppError = require("../utils/appError")
+const AppError = require("../../utils/appError")
 
 module.exports = (schema) => (req,res,next) => {
     console.log(req.body)

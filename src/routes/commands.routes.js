@@ -2,9 +2,8 @@ const express = require('express')
 
 const commandsCtrl = require("../controllers/command.controller")
 const { commands } = require('../schemas')
-const validateBody = require('../middlewares/validateBody')
-const auth = require('../middlewares/auth')
-const isAdmin = require('../middlewares/isAdmin')
+
+const { auth, validateBody, isAdmin } = require('../middlewares')
 
 const commandsRouter = express.Router()
 

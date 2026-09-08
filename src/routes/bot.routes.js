@@ -2,32 +2,35 @@ const express = require("express");
 
 const botCtrl = require("../controllers/bot.controller");
 const { commands, bot } = require("../schemas");
-const validateBody = require("../middlewares/validateBody");
-const setFilters = require("../middlewares/setFilters");
-const setBodyParams = require("../middlewares/setBodyParams");
-const inject = require("../middlewares/injectRessource");
 const { Bot } = require("../models");
-const verifExist = require("../middlewares/verifExist");
-const auth = require("../middlewares/auth");
-const isAdmin = require("../middlewares/isAdmin");
+
+const {
+  auth,
+  isAdmin,
+  setFilters,
+  validateBody,
+  injectRessource,
+  verifExist,
+  setBodyParams,
+} = require("../middlewares");
 
 const botRouter = express.Router();
 
 botRouter.get("/", auth, isAdmin, botCtrl.getBots);
 botRouter.get("/:idbot", auth, setFilters({ _id: "idbot" }), botCtrl.getBot);
 
-botRouter.post("/",auth, isAdmin, validateBody(bot.create), botCtrl.addBot);
+botRouter.post("/", auth, isAdmin, validateBody(bot.create), botCtrl.addBot);
 
 botRouter.post(
   "/:idbot/start",
   auth,
   isAdmin,
-  inject([
+  injectRessource([
     {
       model: Bot,
       param: "idbot",
-      key: "bot"
-    }
+      key: "bot",
+    },
   ]),
   botCtrl.startBot
 );
@@ -36,12 +39,12 @@ botRouter.post(
   "/:idbot/stop",
   auth,
   isAdmin,
-  inject([
+  injectRessource([
     {
       model: Bot,
       param: "idbot",
-      key: "bot"
-    }
+      key: "bot",
+    },
   ]),
   botCtrl.stopBot
 );
@@ -50,16 +53,16 @@ botRouter.delete(
   "/:idbot/kill",
   auth,
   isAdmin,
-  inject([
+  injectRessource([
     {
       model: Bot,
       param: "idbot",
-      key: "bot"
-    }
+      key: "bot",
+    },
   ]),
   validateBody(bot.destroy),
   botCtrl.destroyBot
-)
+);
 
 botRouter.post(
   "/:idbot/command",

@@ -1,5 +1,5 @@
-const healthMonitor = require("../services/healthMonitor")
-const AppError = require("../utils/appError")
+const healthMonitor = require("../../services/healthMonitor")
+const AppError = require("../../utils/appError")
 
 module.exports = (req,res,next) => {
     if(!healthMonitor.isHealthy){

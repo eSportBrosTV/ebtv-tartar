@@ -1,5 +1,5 @@
-const AppError = require('../utils/appError');
-const catchAsync = require('../utils/catchAsync');
+const AppError = require('../../utils/appError');
+const catchAsync = require('../../utils/catchAsync');
 
 const verifExist = (configs) => catchAsync(async (req, res, next) => {
     

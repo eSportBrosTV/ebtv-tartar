@@ -1,10 +1,9 @@
 const express = require("express");
 
-const validateBody = require("../middlewares/validateBody");
 const orgaCtrl = require("../controllers/orga.controller");
-const uninmplemented = require("../middlewares/uninmplemented");
-const isAdmin = require("../middlewares/isAdmin");
 const { orga } = require("../schemas");
+
+const { isAdmin, validateBody, unimplemented } = require("../middlewares");
 
 const membersRouter = express.Router({ mergeParams: true });
 
@@ -16,8 +15,8 @@ membersRouter.post(
   orgaCtrl.addMember
 );
 
-membersRouter.get("/:memId", uninmplemented);
-membersRouter.delete("/:memId", uninmplemented);
-membersRouter.patch("/:memId", uninmplemented);
+membersRouter.get("/:memId", unimplemented);
+membersRouter.delete("/:memId", unimplemented);
+membersRouter.patch("/:memId", unimplemented);
 
 module.exports = membersRouter;
