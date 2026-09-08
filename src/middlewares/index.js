@@ -2,6 +2,7 @@ module.exports = {
   //Auth
   auth: require("./auth/auth"),
   isAdmin: require("./auth/isAdmin"),
+  authorize: require("./auth/authorize"),
 
   //Core
   errorHandler: require("./core/errorHadler"),

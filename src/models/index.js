@@ -3,5 +3,6 @@ module.exports = {
     Orga: require('./Orga'),
     Command: require('./Command'),
     BotCommand: require('./BotCommand'),
-    User: require('./User')
+    User: require('./User'),
+    AssoMember: require('./AssoMember')
 }
