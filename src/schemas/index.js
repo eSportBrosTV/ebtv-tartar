@@ -4,7 +4,8 @@ module.exports = {
     },
     orga: {
         create: require("./orga/create"),
-        addMember: require("./orga/addMember")
+        addMember: require("./orga/addMember"),
+        updateMember: require("./orga/updateMember")
     },
     bot: {
         create: require("./bot/create"),
