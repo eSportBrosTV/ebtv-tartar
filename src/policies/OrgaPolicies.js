@@ -23,13 +23,11 @@ class OrgaPolicies extends BasePolicy {
     }
 
     hasRole = (allowedRoles, paramName = 'orgId') => async (req) => {
-        const memberResult = await this.isMember(paramName)(req)
-
-        if(memberResult != true){
-            return memberResult
-        }
-
         const member = await this.#getMembership(req, paramName)
+
+        if(!member) {
+            throw new Error("hasRole utiliser sans isMember au prealable")
+        }
 
         if(!allowedRoles.includes(member.role)){
             return `Action reserver aux roles ${allowedRoles.join(', ')}`
