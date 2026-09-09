@@ -3,6 +3,10 @@ const catchAsync = require("../../utils/catchAsync");
 
 
 const authorize = (policyFn) => catchAsync(async (req, res, next) => {
+    if(req.user && req.user.roles === "admin"){
+        return next()
+    }
+
     const result = await policyFn(req);
 
     if (result !== true) {
