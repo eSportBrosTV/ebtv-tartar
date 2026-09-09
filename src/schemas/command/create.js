@@ -6,4 +6,4 @@ module.exports =  z.object({
     description: z.string().optional(),
     active: z.boolean(),
     params: z.any().optional()
-});
+}).strict();

@@ -6,4 +6,4 @@ module.exports =  z.object({
     serv: z.string(),
     logChannel: z.string(),
     requireFirstDeploy: z.string().optional()
-});
+}).strict();
