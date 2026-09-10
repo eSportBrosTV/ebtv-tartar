@@ -8,7 +8,13 @@ const inject = (configs) => catchAsync(async (req, res, next) => {
         
         if (!id) return null; 
 
-        const doc = await config.model.findById(id);
+        let query = config.model.findById(id);
+
+        if (config.select) {
+            query = query.select(config.select);
+        }
+        
+        const doc = await query;
 
         if (!doc) {
             throw new AppError(`Ressource introuvable`, 404);
@@ -24,6 +30,7 @@ const inject = (configs) => catchAsync(async (req, res, next) => {
             req[result.key] = result.doc;
         }
     });
+    
     next();
 });
 
