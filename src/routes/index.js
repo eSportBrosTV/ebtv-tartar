@@ -1,15 +1,15 @@
 const express = require("express");
 
-const authRouter = require("./auth.routes");
-const botRouter = require("./bot.routes");
-const commandsRouter = require("./commands.routes");
-const orgaRouter = require("./orga.routes");
+const authRouter = require("./auth/auth.routes");
+const botsRouter = require("./bots/bots.routes");
+const commandsRouter = require("./commands/commands.routes");
+const orgasRouter = require("./orgas/orgas.routes");
 
 const routes = express.Router()
 
 routes.use("/auth", authRouter)
-routes.use("/bots", botRouter)
+routes.use("/bots", botsRouter)
 routes.use("/commands", commandsRouter)
-routes.use("/orgas", orgaRouter)
+routes.use("/orgas", orgasRouter)
 
 module.exports = routes

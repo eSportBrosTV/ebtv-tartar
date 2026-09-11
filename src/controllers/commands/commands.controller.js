@@ -1,6 +1,6 @@
-const { Command } = require("../models")
+const { Command } = require("../../models")
 
-const factory = require("../utils/crudFactory")
+const factory = require("../../utils/crudFactory")
 
 module.exports = {
     addCommand: factory.createOne(Command),

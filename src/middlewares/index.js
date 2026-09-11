@@ -11,6 +11,7 @@ module.exports = {
 
   //Request
   injectRessource: require("./request/injectRessource"),
+  injectCtx: require("./request/injectCtx"),
   setBodyParams: require("./request/setBodyParams"),
   setFilters: require("./request/setFilters"),
 

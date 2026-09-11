@@ -1,7 +1,7 @@
-const catchAsync = require("../utils/catchAsync")
-const { User } = require("../models")
-const AppError = require("../utils/appError")
-const ApiResponse = require("../utils/ApiResponse")
+const catchAsync = require("../../utils/catchAsync")
+const { User } = require("../../models")
+const AppError = require("../../utils/appError")
+const ApiResponse = require("../../utils/ApiResponse")
 
 const register = catchAsync(async (req,res,next) => {
     if(!req.user.roles.includes("admin")){

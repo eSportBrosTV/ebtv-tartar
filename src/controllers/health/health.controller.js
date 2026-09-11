@@ -1,6 +1,6 @@
-const healthMonitor = require("../services/healthMonitor");
-const ApiResponse = require("../utils/ApiResponse");
-const catchAsync = require("../utils/catchAsync");
+const healthMonitor = require("../../services/healthMonitor");
+const ApiResponse = require("../../utils/ApiResponse");
+const catchAsync = require("../../utils/catchAsync");
 
 const getHealth = catchAsync((req, res, next) => {
   const statusCode = healthMonitor.isHealthy ? 200 : 503;

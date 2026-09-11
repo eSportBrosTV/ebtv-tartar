@@ -3,8 +3,8 @@ const BasePolicy = require("./BasePolicy");
 
 class OrgaPolicies extends BasePolicy {
     
-    #getMembership = (req, getId) => {
-        const orgaId = getId(req);
+    #getMembership = (req, getOrgId) => {
+        const orgaId = getOrgId(req);
         
         const cacheKey = `orgaMembership_${orgaId}`;
 
@@ -18,16 +18,16 @@ class OrgaPolicies extends BasePolicy {
         });
     };
 
-    isMember = (getId = (req) => req.params.orgId || req.query.orgId) => async (req) => {
-        const member = await this.#getMembership(req, getId);
+    isMember = (getOrgId = (req) => req.ctx.orga._id) => async (req) => {
+        const member = await this.#getMembership(req, getOrgId);
         return member ? true : "Vous ne faites pas partie de cette organisation.";
     }
 
-    hasRole = (allowedRoles, getId = (req) => req.params.orgId || req.query.orgId) => async (req) => {
-        const member = await this.#getMembership(req, getId);
+    hasRole = (allowedRoles, getOrgId = (req) => req.ctx.orga._id) => async (req) => {
+        const member = await this.#getMembership(req, getOrgId);
 
         if(!member) {
-            throw new Error("hasRole utilisé sans isMember au préalable (ou ressource introuvable)");
+            throw new Error("hasRole utilisé sans isMember au préalable");
         }
 
         if(!allowedRoles.includes(member.role)){

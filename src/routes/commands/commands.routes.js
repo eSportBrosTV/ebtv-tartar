@@ -1,9 +1,9 @@
 const express = require('express')
 
-const commandsCtrl = require("../controllers/command.controller")
-const { commands } = require('../schemas')
+const commandsCtrl = require("../../controllers/commands/commands.controller")
+const { commands } = require('../../schemas')
 
-const { auth, validateBody, isAdmin } = require('../middlewares')
+const { auth, validateBody, isAdmin } = require('../../middlewares')
 
 const commandsRouter = express.Router()
 
