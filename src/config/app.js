@@ -5,7 +5,7 @@ const session = require('express-session')
 const { default: MongoStore } = require('connect-mongo');
 const passport = require('passport');
 
-const healthRouter = require('../routes/health.routes');
+const healthRouter = require('../routes/health/health.routes');
 
 const routes = require('../routes');
 

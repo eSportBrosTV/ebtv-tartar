@@ -2,6 +2,7 @@ const { getIO } = require("../../config/socket");
 const { BotCommand } = require("../../models");
 const { configGenerator } = require("../../services/configGenerator");
 const ApiResponse = require("../../utils/ApiResponse");
+const catchAsync = require("../../utils/catchAsync");
 
 const addCommand = catchAsync(async (req, res, next) => {
     const orcaId = req.ctx.bot.id;
