@@ -14,6 +14,6 @@ authRouter.post("/logout", auth, authCtrl.logout)
 
 authRouter.get("/me", auth, authCtrl.me)
 
-authRouter.post("/register", validateBody(user.create), auth, authorize(policies.admin.isAdmin), authCtrl.register)
+authRouter.post("/register", auth, validateBody(user.create), authorize(policies.admin.isAdmin), authCtrl.register)
 
 module.exports = authRouter
