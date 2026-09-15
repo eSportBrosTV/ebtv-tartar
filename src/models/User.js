@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       default: "user",
       required: true,
     },
+    sessionVersion: {
+      type: Number,
+      default: 0
+    }
   },
   { timestamps: true }
 );
@@ -29,8 +33,27 @@ userSchema.pre("save", async function () {
   this.password = await bcrypt.hash(this.password, 12);
 });
 
-userSchema.methods.correctPassword = async function(givenPwd, dbPwd){
-    return await bcrypt.compare(givenPwd, dbPwd)
+userSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], async function () {
+  const update = this.getUpdate();
+  const password = update.password || (update.$set && update.$set.password);
+
+  if (!password) return;
+
+  const hashed = await bcrypt.hash(password, 12);
+
+  if (update.password) {
+    update.password = hashed;
+  }
+  if (update.$set && update.$set.password) {
+    update.$set.password = hashed;
+  }
+
+  update.$inc = update.$inc || {};
+  update.$inc.sessionVersion = 1;
+});
+
+userSchema.methods.correctPassword = async function (givenPwd, dbPwd) {
+  return await bcrypt.compare(givenPwd, dbPwd)
 }
 
 module.exports = mongoose.model("User", userSchema, "user");

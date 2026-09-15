@@ -39,7 +39,8 @@ const botService = {
 }
 
 const userService = {
-    auth: userAuth
+    auth: userAuth,
+    manage: userData
 }
 
 module.exports = {

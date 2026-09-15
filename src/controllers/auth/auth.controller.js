@@ -9,6 +9,8 @@ const register = catchAsync(async (req, res, next) => {
 })
 
 const login = catchAsync(async (req, res, next) => {
+    req.session.sessionVersion = req.user.sessionVersion
+
     ApiResponse.ok(res, req.user)
 })
 
@@ -26,13 +28,8 @@ const logout = catchAsync(async (req, res, next) => {
     })
 })
 
-const me = catchAsync(async (req, res, next) => {
-    ApiResponse.ok(res, req.user)
-})
-
 module.exports = {
     register,
     login,
-    logout,
-    me
+    logout
 }

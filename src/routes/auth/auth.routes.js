@@ -12,8 +12,6 @@ const authRouter = express.Router()
 authRouter.post("/login", validateBody(user.login), passport.authenticate('local'), authCtrl.login)
 authRouter.post("/logout", auth, authCtrl.logout)
 
-authRouter.get("/me", auth, authCtrl.me)
-
 authRouter.post("/register", auth, validateBody(user.create), authorize(policies.admin.isAdmin), authCtrl.register)
 
 module.exports = authRouter

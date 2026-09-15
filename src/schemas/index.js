@@ -16,6 +16,7 @@ module.exports = {
     },
     user: {
         create: require("./users/create"),
-        login: require("./users/login")
+        login: require("./users/login"),
+        update: require("./users/update")
     }
 }
