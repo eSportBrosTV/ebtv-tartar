@@ -1,4 +1,4 @@
-const { docker } = require("../config/docker");
+const { docker } = require("../src/config/docker");
 
 const env = process.env.ENVEX;
 

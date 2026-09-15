@@ -1,0 +1,19 @@
+const codesEnum = {
+    NOT_FOUND: "NOT_FOUND",
+    BAD_REQUEST: "BAD_REQUEST",
+    BAD_STATE: "BAD_STATE",
+
+
+    CONFLICT: "CONFLICT",
+    DATABASE_ERROR: "DATABASE_ERROR",
+
+    PROVIDER_DOWN: "PROVIDER_DOWN",
+    PROVIDER_ERROR: "PROVIDER_ERROR",
+    PROVIDER_TIMEOUT: "PROVIDER_TIMEOUT",
+
+    BOT_STOP_FAILED: "BOT_STOP_FAILED"
+}
+
+const ErrorCodes = Object.freeze(codesEnum)
+
+module.exports = ErrorCodes

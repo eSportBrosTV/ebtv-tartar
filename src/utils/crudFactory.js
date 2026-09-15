@@ -1,6 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('./ApiResponse');
-const AppError = require('./appError');
+const AppError = require('./errors/appError');
 
 exports.createOne = (Model) => catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body);

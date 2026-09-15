@@ -1,6 +1,7 @@
 const { User, AssoMember } = require("../../models")
 const ApiResponse = require("../../utils/ApiResponse")
 const catchAsync = require("../../utils/catchAsync")
+const AppError = require("../../utils/errors/appError")
 
 const addMember = catchAsync(async (req, res, next) => {
     const userId = req.body.user

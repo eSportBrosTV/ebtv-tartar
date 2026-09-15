@@ -1,4 +1,4 @@
-const AppError = require("../../utils/appError");
+const AppError = require("../../utils/errors/appError");
 const catchAsync = require("../../utils/catchAsync");
 
 
