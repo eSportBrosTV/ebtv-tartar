@@ -1,6 +1,8 @@
 const express = require("express");
 
-const { setBodyParams, validateBody } = require("../../middlewares");
+const { validateBody } = require("../../middlewares");
+
+const botCommandRouter = require("./_idbot.commands._idbcommand.routes");
 
 const schemas = require("../../schemas");
 
@@ -8,11 +10,9 @@ const botCommandsCtrl = require("../../controllers/bots/_idbot.commands.controll
 
 const botCommandsRouter = express.Router({ mergeParams: true })
 
-botCommandsRouter.post(
-  "/",
-  setBodyParams({ bot_id: "idbot" }),
-  validateBody(schemas.bot.commandCreate),
-  botCommandsCtrl.addCommand
-);
+botCommandsRouter.post("/", validateBody(schemas.bot.commandCreate), botCommandsCtrl.addCommand);
+botCommandsRouter.get("/", botCommandsCtrl.getCommands)
+
+botCommandsRouter.use("/:idbcommand", botCommandRouter)
 
 module.exports = botCommandsRouter

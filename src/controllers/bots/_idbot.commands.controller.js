@@ -1,31 +1,21 @@
-const { getIO } = require("../../config/socket");
-const { BotCommand } = require("../../models");
-const { configGenerator } = require("../../services/configGenerator");
+const { botService } = require("../../services");
 const ApiResponse = require("../../utils/ApiResponse");
 const catchAsync = require("../../utils/catchAsync");
 
-const addCommand = catchAsync(async (req, res, next) => {
-    const orcaId = req.ctx.bot.id;
+const addCommand = catchAsync(async (req,res,next) => {
+    const newCommand = await botService.commands.create({
+        bot_id: req.ctx.bot._id,
+        ...req.body
+    })
+    ApiResponse.created(res, newCommand)
+})
 
-    const newCommandBot = await BotCommand.findOneAndUpdate(
-        {
-            bot_id: orcaId,
-            command_id: req.body.command_id,
-        },
-        req.body,
-        {
-            new: true,
-            upsert: true,
-        }
-    );
-
-    let newConf = await configGenerator(orcaId);
-
-    getIO().of("/bots").to(orcaId).emit("update_config", newConf);
-
-    ApiResponse.created(res, newCommandBot);
-});
+const getCommands = catchAsync(async (req,res,next) => {
+    const commands = await botService.commands.getAllOfBot(req.ctx.bot._id)
+    ApiResponse.ok(res, commands)
+})
 
 module.exports = {
-    addCommand
+    addCommand,
+    getCommands
 }

@@ -22,6 +22,7 @@ botRouter.use(
     ]), authorize(policies.orga.isMember((req) => req.ctx.bot.orga)))
 
 botRouter.get("/", botCtrl.getBot);
+botRouter.patch("/", validateBody(schemas.bot.update), botCtrl.updateBot)
 
 botRouter.post("/start", botCtrl.startBot);
 botRouter.post("/stop", botCtrl.stopBot);

@@ -100,7 +100,7 @@ class DockerProvider extends ProviderService {
             if (info.State.Running) await container.stop();
             await container.remove();
 
-            this._logInfo(`Conteneur ${containerId} dé=etruit`);
+            this._logInfo(`Conteneur ${containerId} détruit`);
             return true;
         } catch (err) {
             this._logInfo(`Impossible de detruire ${containerId} : ${err.message}`);

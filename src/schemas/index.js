@@ -10,7 +10,9 @@ module.exports = {
     bot: {
         create: require("./bot/create"),
         commandCreate: require('./bot/commandCreate'),
-        destroy: require('./bot/destroy')
+        commandUpdate: require('./bot/commandUpdate'),
+        destroy: require('./bot/destroy'),
+        update: require('./bot/update')
     },
     user: {
         create: require("./users/create"),

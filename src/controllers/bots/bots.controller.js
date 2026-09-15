@@ -1,49 +1,31 @@
-const { Bot } = require("../../models");
-const factory = require("../../utils/crudFactory");
 const catchAsync = require("../../utils/catchAsync");
-const dockerService = require("../../services/dockerService");
-const jwt = require("jsonwebtoken");
 const ApiResponse = require("../../utils/ApiResponse");
+const { botService } = require("../../services");
+
+const getBots = catchAsync(async (req,res,next) => {
+  const bots = await botService.manage.getAll()
+
+  ApiResponse.ok(res, bots)
+})
 
 const addBot = catchAsync(async (req, res, next) => {
-  const newBot = new Bot(req.body);
+  const newBot = await botService.manage.create(req.body)
 
-  const botJwt = jwt.sign(
-    {
-      orca_id: newBot.id,
-      created_at: Date.now(),
-    },
-    process.env.JWT_SECRET
-  );
+  try {
+    await botService.deploy.deployBot(newBot, true)
 
-  let newContainerId = await dockerService.createContainer({
-    botId: newBot.id,
-    tartarToken: botJwt,
-    disToken: newBot.token,
-  });
+    ApiResponse.created(res, newBot, "Bot creer et demarer")
+  } catch (err) {
 
-  newBot.containerId = newContainerId;
-
-  await newBot.save();
-
-  let isStarted = await dockerService.startContainer(newContainerId);
-
-  if (isStarted) {
-    ApiResponse.created(res, newBot, "Bot creer et demarer");
-  } else {
-    const response = new ApiResponse(
-      res,
-      201,
-      newBot,
-      "Bot creer mais non demarer"
-    );
+    const response = new ApiResponse(res, 201, newBot, "Bot creer mais non demarer")
     response.payload.status = "partial";
-
     response.send();
+
   }
-});
+})
+
 
 module.exports = {
-  getBots: factory.getAll(Bot),
+  getBots,
   addBot,
 };
