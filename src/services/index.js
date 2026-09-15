@@ -1,4 +1,4 @@
-const { Command } = require("../models");
+const { Command, User } = require("../models");
 
 const DataService = require("./core/DataService");
 const BotCommandDataService = require("./data/BotCommandDataService");
@@ -9,11 +9,13 @@ const BotConfigService = require("./domain/bot/BotConfigService");
 
 const BotDeploymentService = require("./domain/bot/BotDeploymentService");
 const BotManagementService = require("./domain/bot/BotManAgementService");
+const AuthService = require("./domain/user/AuthService");
 
 const DockerProvider = require("./providers/DockerProvider");
 const SocketProvider = require("./providers/SocketProvider");
 
 const commandData = new DataService(Command)
+const userData = new DataService(User)
 
 const botData = new BotDataService()
 const orgaData = new OrgaDataService()
@@ -27,6 +29,8 @@ const botConfig = new BotConfigService(botData, orgaData, commandData, botComman
 const botManagement = new BotManagementService(botData, botConfig, socketProvider)
 const botCommand = new BotCommandService(botCommandData, botConfig, socketProvider)
 
+const userAuth = new AuthService(userData)
+
 const botService = {
     deploy: botDeployment,
     manage: botManagement,
@@ -34,8 +38,13 @@ const botService = {
     commands: botCommand
 }
 
+const userService = {
+    auth: userAuth
+}
+
 module.exports = {
     botService,
+    userService,
     providers : {
         socketProvider: socketProvider
     }

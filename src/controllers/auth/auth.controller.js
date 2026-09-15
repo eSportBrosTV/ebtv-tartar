@@ -1,12 +1,9 @@
 const catchAsync = require("../../utils/catchAsync")
-const { User } = require("../../models")
-const AppError = require("../../utils/errors/appError")
 const ApiResponse = require("../../utils/ApiResponse")
+const { userService } = require("../../services")
 
 const register = catchAsync(async (req, res, next) => {
-    let newUser = await User.create(req.body)
-
-    newUser.password = undefined
+    let newUser = await userService.auth.register(req.body)
 
     ApiResponse.created(res, newUser)
 })
