@@ -9,6 +9,7 @@ const BotConfigService = require("./domain/bot/BotConfigService");
 
 const BotDeploymentService = require("./domain/bot/BotDeploymentService");
 const BotManagementService = require("./domain/bot/BotManAgementService");
+const CommandManagementService = require("./domain/command/CommandManagementService");
 const AuthService = require("./domain/user/AuthService");
 
 const DockerProvider = require("./providers/DockerProvider");
@@ -31,6 +32,8 @@ const botCommand = new BotCommandService(botCommandData, botConfig, socketProvid
 
 const userAuth = new AuthService(userData)
 
+const commandManagement= new CommandManagementService(commandData, socketProvider)
+
 const botService = {
     deploy: botDeployment,
     manage: botManagement,
@@ -43,9 +46,14 @@ const userService = {
     manage: userData
 }
 
+const commandService = {
+    manage: commandManagement
+}
+
 module.exports = {
     botService,
     userService,
+    commandService,
     providers : {
         socketProvider: socketProvider
     }

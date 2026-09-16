@@ -59,6 +59,7 @@ class ManagementDomainService extends BaseDomainService {
 
     async delete(idOrDoc) {
         const doc = await this._resolveDocument(this.db, idOrDoc);
+        console.log(doc)
 
         await this._beforeDelete(doc);
 

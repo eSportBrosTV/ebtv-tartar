@@ -1,8 +1,20 @@
-const { Command } = require("../../models")
+const { commandService } = require("../../services")
+const ApiResponse = require("../../utils/ApiResponse")
+const catchAsync = require("../../utils/catchAsync")
 
-const factory = require("../../utils/crudFactory")
+const addCommand = catchAsync(async (req,res,next) => {
+    const newCommand = await commandService.manage.create(req.body)
+
+    ApiResponse.created(res, newCommand)
+})
+
+const getCommands = catchAsync(async (req,res,next) => {
+    const commands = await commandService.manage.getAll()
+
+    ApiResponse.ok(res, commands)
+})
 
 module.exports = {
-    addCommand: factory.createOne(Command),
-    getCommand: factory.getOne(Command)
+    getCommands,
+    addCommand
 }

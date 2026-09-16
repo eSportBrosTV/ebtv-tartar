@@ -1,6 +1,7 @@
 module.exports = {
     commands: {
-        create: require("./command/create")
+        create: require("./command/create"),
+        update: require("./command/update")
     },
     orga: {
         create: require("./orga/create"),

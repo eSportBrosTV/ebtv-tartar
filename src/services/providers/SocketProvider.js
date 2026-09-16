@@ -33,5 +33,11 @@ class SocketProvider extends ProviderService {
             .to(botId.toString())
             .emit(event, payload);
     }
+
+    emitToBots(event){
+        getIO()
+            .of("/bots")
+            .emit(event)
+    }
 }
 module.exports = SocketProvider;

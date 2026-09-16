@@ -138,6 +138,7 @@ class DataService extends BaseService {
             throw error;
         }
 
+        console.error(error)
         this._logInfo(`[CRASH MONGOOSE] ${error.message}`);
         this._throwError("Erreur interne de la base de donnees", ErrorCodes.BAD_REQUEST);
     }
