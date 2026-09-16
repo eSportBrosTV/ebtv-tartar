@@ -28,25 +28,25 @@ const commandSchema = new mongoose.Schema(
   }
 );
 
-const cleanCommandData = async (dataIds, mongooseContext) => {
+const cleanCommandData = async (dataIds) => {
   const ids = Array.isArray(dataIds) ? dataIds : [dataIds];
   if (ids.length === 0) return;
 
-  await mongooseContext.model('BotCommand').deleteMany({ command_id: { $in: ids } });
+  await mongoose.model('BotCommand').deleteMany({ command_id: { $in: ids } });
 };
 
 commandSchema.pre('deleteOne', { document: true, query: false }, async function() {
-  await cleanCommandData(this._id, this);
+  await cleanCommandData(this._id);
 });
 
 commandSchema.pre(['findOneAndDelete', 'findOneAndRemove'], async function() {
   const doc = await this.model.findOne(this.getQuery());
-  if (doc) await cleanCommandData(doc._id, this);
+  if (doc) await cleanCommandData(doc._id);
 });
 
 commandSchema.pre('deleteMany', async function() {
   const docs = await this.model.find(this.getQuery());
-  await cleanCommandData(docs.map(d => d._id), this);
+  await cleanCommandData(docs.map(d => d._id));
 });
 
 module.exports = mongoose.model("Command", commandSchema, "command");

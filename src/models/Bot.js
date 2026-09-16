@@ -35,25 +35,25 @@ const botSchema = new mongoose.Schema({
   }
 });
 
-const cleanUpBotData = async (botIds, mongooseContext) => {
+const cleanUpBotData = async (botIds) => {
   const ids = Array.isArray(botIds) ? botIds : [botIds];
   if (ids.length === 0) return;
 
-  await mongooseContext.model('BotCommand').deleteMany({ bot_id: { $in: ids } });
+  await mongoose.model('BotCommand').deleteMany({ bot_id: { $in: ids } });
 };
 
 botSchema.pre('deleteOne', { document: true, query: false }, async function() {
-  await cleanUpBotData(this._id, this);
+  await cleanUpBotData(this._id);
 });
 
 botSchema.pre(['findOneAndDelete', 'findOneAndRemove'], async function() {
   const doc = await this.model.findOne(this.getQuery());
-  if (doc) await cleanUpBotData(doc._id, this);
+  if (doc) await cleanUpBotData(doc._id);
 });
 
 botSchema.pre('deleteMany', async function() {
   const docs = await this.model.find(this.getQuery());
-  await cleanUpBotData(docs.map(d => d._id), this);
+  await cleanUpBotData(docs.map(d => d._id));
 });
 
 foreignKeyPlugin(botSchema)

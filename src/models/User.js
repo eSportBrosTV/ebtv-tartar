@@ -52,25 +52,25 @@ userSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], async function (
   update.$inc.sessionVersion = 1;
 });
 
-const cleanUserData = async (dataIds, mongooseContext) => {
+const cleanUserData = async (dataIds) => {
   const ids = Array.isArray(dataIds) ? dataIds : [dataIds];
   if (ids.length === 0) return;
 
-  await mongooseContext.model('AssoMember').deleteMany({ user: { $in: ids } });
+  await mongoose.model('AssoMember').deleteMany({ user: { $in: ids } });
 };
 
 userSchema.pre('deleteOne', { document: true, query: false }, async function () {
-  await cleanUserData(this._id, this);
+  await cleanUserData(this._id);
 });
 
 userSchema.pre(['findOneAndDelete', 'findOneAndRemove'], async function () {
   const doc = await this.model.findOne(this.getQuery());
-  if (doc) await cleanUserData(doc._id, this);
+  if (doc) await cleanUserData(doc._id);
 });
 
 userSchema.pre('deleteMany', async function () {
   const docs = await this.model.find(this.getQuery());
-  await cleanUserData(docs.map(d => d._id), this);
+  await cleanUserData(docs.map(d => d._id));
 });
 
 userSchema.methods.correctPassword = async function (givenPwd, dbPwd) {
