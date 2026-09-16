@@ -11,16 +11,16 @@ const cleanOrgaData = async (dataIds, mongooseContext) => {
     await mongooseContext.model('AssoMember').deleteMany({ orga: { $in: ids } });
 };
 
-commandSchema.pre('deleteOne', { document: true, query: false }, async function () {
+orgaSchema.pre('deleteOne', { document: true, query: false }, async function () {
     await cleanOrgaData(this._id, this);
 });
 
-commandSchema.pre(['findOneAndDelete', 'findOneAndRemove'], async function () {
+orgaSchema.pre(['findOneAndDelete', 'findOneAndRemove'], async function () {
     const doc = await this.model.findOne(this.getQuery());
     if (doc) await cleanOrgaData(doc._id, this);
 });
 
-commandSchema.pre('deleteMany', async function () {
+orgaSchema.pre('deleteMany', async function () {
     const docs = await this.model.find(this.getQuery());
     await cleanOrgaData(docs.map(d => d._id), this);
 });
