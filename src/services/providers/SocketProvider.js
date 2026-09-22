@@ -1,4 +1,4 @@
-const ProviderService = require('../Core/ProviderService');
+const ProviderService = require('../core/ProviderService');
 const { getIO } = require('../../config/socket');
 const ErrorCodes = require('../../utils/errors/ErrorCodes');
 
@@ -19,7 +19,7 @@ class SocketProvider extends ProviderService {
             botRep = rep[0];
         } catch (err) {
             this._logInfo(`Le bot ${botId} n'a pas repondu au socket`);
-            if (!force) this.throwError("Le bot ne repond pas", ErrorCodes.PROVIDER_TIMEOUT);
+            if (!force) this._throwError("Le bot ne repond pas", ErrorCodes.PROVIDER_TIMEOUT);
         }
 
         if (botRep && !botRep.success && !force) {

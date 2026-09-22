@@ -9,7 +9,7 @@ const BotCommandService = require("./domain/bot/BotCommandService");
 const BotConfigService = require("./domain/bot/BotConfigService");
 
 const BotDeploymentService = require("./domain/bot/BotDeploymentService");
-const BotManagementService = require("./domain/bot/BotManAgementService");
+const BotManagementService = require("./domain/bot/BotManagementService");
 const CommandManagementService = require("./domain/command/CommandManagementService");
 const ReleaseService = require("./domain/release/ReleaseService");
 const AuthService = require("./domain/user/AuthService");

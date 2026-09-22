@@ -11,17 +11,19 @@ const routes = require('../routes');
 
 const { isHealthyConnect, errorHandler } = require('../middlewares');
 const sessionMiddleware = require('./session');
+const corsOptions = require('./cors');
 
 const app = express();
 
 require('./passport')
 
+if (process.env.ENVEX === 'prod') {
+    app.set('trust proxy', 1)
+}
+
 app.use(express.json())
 
-app.use(cors({
-    origin: '*',
-    credentials: true
-}))
+app.use(cors(corsOptions))
 
 app.use('/health', healthRouter)
 app.use(isHealthyConnect)

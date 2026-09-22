@@ -1,5 +1,5 @@
 // services/Providers/DockerProvider.js
-const ProviderService = require('../Core/ProviderService'); 
+const ProviderService = require('../core/ProviderService'); 
 const { docker } = require('../../config/docker');
 const ErrorCodes = require('../../utils/errors/ErrorCodes');
 
@@ -65,7 +65,7 @@ class DockerProvider extends ProviderService {
     }
 
     async startContainer(containerId) {
-        if (!containerId) this.throwError("ID du conteneur manquant", ErrorCodes.PROVIDER_ERROR);
+        if (!containerId) this._throwError("ID du conteneur manquant", ErrorCodes.PROVIDER_ERROR);
 
         try {
             const container = this.#docker.getContainer(containerId);

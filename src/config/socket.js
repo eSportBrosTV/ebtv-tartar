@@ -1,6 +1,7 @@
 const { Server } = require('socket.io');
 const botSocket = require('../sockets/bots/botSocket');
 const panelSocket = require('../sockets/panel/panelSocket');
+const corsOptions = require('./cors');
 
 let io;
 
@@ -9,9 +10,8 @@ module.exports = {
         io = new Server(httpServer, {
             path: '/socket/',
             cors: {
-                origin: "*",
-                methods: ["GET", "POST"],
-                credentials: true
+                ...corsOptions,
+                methods: ["GET", "POST"]
             }
         });
 

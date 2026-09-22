@@ -24,6 +24,8 @@ const botCommandSchema = new mongoose.Schema(
   }
 );
 
+botCommandSchema.index({bot_id: 1, command_id: 1}, {unique: true})
+
 foreignKeyPlugin(botCommandSchema)
 
 module.exports = mongoose.model("BotCommand", botCommandSchema, "bot_command");

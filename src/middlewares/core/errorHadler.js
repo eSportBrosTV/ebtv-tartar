@@ -23,7 +23,7 @@ const translateGlobalError = (code) => {
         case ErrorCodes.BAD_REQUEST: return 400;
         case ErrorCodes.NOT_FOUND: return 404;
         
-        case ErrorCodes.CONFLICT: return 
+        case ErrorCodes.CONFLICT:
         case ErrorCodes.BAD_STATE: return 409;
         
         case ErrorCodes.PROVIDER_ERROR:
@@ -40,6 +40,12 @@ const translateGlobalError = (code) => {
 
 
 module.exports = (err, req, res, next) => {
+    if (err.code && Object.values(ErrorCodes).includes(err.code)) {
+        err.statusCode = translateGlobalError(err.code)
+        err.status = err.statusCode >= 500 ? 'error' : 'fail'
+        err.isOperational = true
+    }
+
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
 
@@ -59,12 +65,6 @@ module.exports = (err, req, res, next) => {
         if (error.code === 11000) error = handleDuplicateFieldsDB(error);
         
         if (error.name === 'ValidationError') error = handleValidationErrorDB(error);
-
-        if(error.code && Object.values(ErrorCodes).includes(error.code)){
-            error.statusCode = translateGlobalError(error.code)
-            error.status = error.statusCode >= 500 ? 'error' : 'fail'
-            error.isOperational = true
-        }
 
         if (error.isOperational) {
             res.status(error.statusCode).json({

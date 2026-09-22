@@ -29,7 +29,7 @@ class BaseDomainService extends BaseService {
         const doc = await dataService.findById(idToSearch);
 
         if (!doc) {
-            this.throwError("Document introuvable", ErrorCodes.NOT_FOUND);
+            this._throwError("Document introuvable", ErrorCodes.NOT_FOUND);
         }
 
         return doc; 
