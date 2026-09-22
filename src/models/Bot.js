@@ -32,6 +32,20 @@ const botSchema = new mongoose.Schema({
   containerId: {
     type: String,
     default: null
+  },
+  updateStatus: {
+    type: String,
+    enum: ["IDLE", "UPDATING", "ERROR"],
+    default: "IDLE",
+    required: true
+  },
+  version: {
+    type: String,
+    default: "0.0.1"
+  },
+  lastErrorMessage: {
+    type: String,
+    default: null
   }
 });
 

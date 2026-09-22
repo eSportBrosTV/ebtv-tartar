@@ -13,6 +13,10 @@ class DockerProvider extends ProviderService {
         this.#env = process.env.ENVEX;
     }
 
+    #getImageName(version){
+        return `${process.env.BOT_IMAGE_PROD}:${version}`
+    }
+
     async getContainers() {
         try {
             const containers = await this.#docker.listContainers({
@@ -28,9 +32,9 @@ class DockerProvider extends ProviderService {
         }
     }
 
-    async createContainer({ tartarToken, disToken, botId }) {
+    async createContainer({ tartarToken, disToken, botId, version = 'latest' }) {
         try {
-            const imageToUse = this.#env === "dev" ? "node:20-alpine" : process.env.BOT_IMAGE_PROD;
+            const imageToUse = this.#env === "dev" ? "node:20-alpine" : this.#getImageName(version);
             const binds = this.#env === "dev" ? [`${process.env.LOCAL_BOT_PATH}:/app`] : [];
             const cmd = this.#env === "dev" ? ["sh", "-c", "npm install && node src/server.js"] : undefined;
             const managerURL = this.#env === "prod" ? process.env.MANAGER_PUBLIC_URL : "http://host.docker.internal:3000";
@@ -108,6 +112,33 @@ class DockerProvider extends ProviderService {
         }
     }
 
+    async pullImage(version) {
+        if (this.#env === "dev") {
+            this._logInfo("Mode DEV : Pas de pull d'image");
+            return true;
+        }
+
+        const imageToUse = this.#getImageName(version);
+        this._logInfo(`Telechargement de la nouvelle image ${imageToUse}...`);
+
+        return new Promise((resolve, reject) => {
+            this.#docker.pull(imageToUse, (err, stream) => {
+                if (err) {
+                    return reject(new Error(`Erreur lors de l'initiation du pull Docker: ${err.message}`));
+                }
+
+                const onFinished = (pullErr, output) => {
+                    if (pullErr) {
+                        return reject(new Error(`Echec du telechargement de l'image: ${pullErr.message}`));
+                    }
+                    resolve(true);
+                }
+
+                this.#docker.modem.followProgress(stream, onFinished);
+            });
+        });
+    }
+
     async checkContainerExist(containerId) {
         if (!containerId) return false;
 
@@ -118,6 +149,28 @@ class DockerProvider extends ProviderService {
         } catch (err) {
             if (err.statusCode === 404) return false;
             this._throwError(`Erreur inspection Docker : ${err.message}`, ErrorCodes.PROVIDER_ERROR);
+        }
+    }
+    
+    async fetchTagsFromHub() {
+        const repoName = process.env.BOT_IMAGE_PROD; 
+
+        try {
+            const response = await fetch(`https://hub.docker.com/v2/repositories/${repoName}/tags/?page_size=15`);
+            if (!response.ok) throw new Error("Docker Hub injoignable");
+
+            const data = await response.json();
+
+            return data.results
+                .filter(tag => tag.name !== 'latest')
+                .map(tag => ({
+                    name: tag.name,
+                    date: new Date(tag.tag_last_pushed)
+                }));
+
+        } catch (error) {
+            this._logError(`Erreur recuperation tags Docker Hub: ${error.message}`);
+            return [];
         }
     }
 }

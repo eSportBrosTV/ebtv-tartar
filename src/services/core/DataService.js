@@ -25,6 +25,19 @@ class DataService extends BaseService {
         }
     }
 
+    async exist(filter = {}){
+        try {
+            const existingDoc = await this.model.exists(filter)
+            if(!existingDoc) {
+                return false
+            } else {
+                return true
+            }
+        } catch (error) {
+            this.handleMongoError(error);
+        }
+    }
+
     /**
      * @param {string} id
      * @returns {Promise<T | null>}

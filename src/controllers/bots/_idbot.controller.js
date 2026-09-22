@@ -26,10 +26,16 @@ const destroyBot = catchAsync(async (req, res, next) => {
     ApiResponse.ok(res, null, "Bot supprimer avec succer")
 });
 
+const updateImageBot = catchAsync(async (req,res,next) => {
+    await botService.deploy.updateBot(req.ctx.bot)
+    ApiResponse.accepted(res, null, "Mise a jour lancer avec succes")
+})
+
 module.exports = {
     startBot,
     stopBot,
     destroyBot,
     getBot,
-    updateBot
+    updateBot,
+    updateImageBot
 }

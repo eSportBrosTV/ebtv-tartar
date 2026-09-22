@@ -4,5 +4,6 @@ module.exports = {
     Command: require('./Command'),
     BotCommand: require('./BotCommand'),
     User: require('./User'),
-    AssoMember: require('./AssoMember')
+    AssoMember: require('./AssoMember'),
+    BotRelease: require('./BotRelease')
 }

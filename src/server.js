@@ -12,6 +12,7 @@ const { connectDocker } = require("./config/docker");
 const shutdownProccess = require("./utils/shutdownProccess");
 const healthMonitor = require("./services/healthMonitor");
 const healthProccess = require("./utils/healthProccess");
+const { releaseService } = require("./services");
 
 const server = http.createServer(app);
 
@@ -28,6 +29,8 @@ const startApp = async () => {
 
     await Bot.updateMany({}, { isOnline: false });
     console.log("[Server] Statut des bot initialiser");
+
+    await releaseService.syncCatalog()
 
     healthMonitor.startMonitoring()
     healthMonitor.on('status_changed', healthProccess)

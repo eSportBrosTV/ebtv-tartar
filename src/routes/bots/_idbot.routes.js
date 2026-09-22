@@ -27,6 +27,7 @@ botRouter.patch("/", validateBody(schemas.bot.update), botCtrl.updateBot)
 botRouter.post("/start", botCtrl.startBot);
 botRouter.post("/stop", botCtrl.stopBot);
 botRouter.post("/kill", authorize(policies.orga.hasRole(["owner"], (req) => req.ctx.bot.orga)), validateBody(schemas.bot.destroy), botCtrl.destroyBot);
+botRouter.post("/update", authorize(policies.orga.hasRole(["owner"], (req) => req.ctx.bot.orga)), botCtrl.updateImageBot)
 
 botRouter.use("/commands", botCommandsRouter)
 

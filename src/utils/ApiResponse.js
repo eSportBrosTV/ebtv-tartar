@@ -27,6 +27,10 @@ class ApiResponse {
         return new ApiResponse(res, 201, data, message).send();
     }
 
+    static accepted(res, data = null, message = null) {
+        return new ApiResponse(res, 202, data, message).send()
+    }
+
     static noContent(res) {
         return new ApiResponse(res, 204).send();
     }
