@@ -1,18 +1,18 @@
 const BaseDomainService = require("../../core/BaseDomainService");
 
 class AuthService extends BaseDomainService {
-    #userDb
+    #userManage
     /**
      * 
-     * @param {import('../../core/DataService')} userData 
+     * @param {import('../../domain/user/UserManagementService')} userManage
      */
-    constructor(userData){
+    constructor(userManage){
         super('Auth')
-        this.#userDb = userData
+        this.#userManage = userManage
     }
 
     async register(payload){
-        const newUser = await this.#userDb.create(payload)
+        const newUser = await this.#userManage.create(payload)
 
         const safeUser = newUser.toObject()
         delete safeUser.password

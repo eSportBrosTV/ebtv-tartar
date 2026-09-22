@@ -1,6 +1,6 @@
 const catchAsync = require("../../utils/catchAsync")
 const ApiResponse = require("../../utils/ApiResponse")
-const { userService } = require("../../services")
+const { userService, providers } = require("../../services")
 
 const register = catchAsync(async (req, res, next) => {
     let newUser = await userService.auth.register(req.body)
@@ -15,6 +15,8 @@ const login = catchAsync(async (req, res, next) => {
 })
 
 const logout = catchAsync(async (req, res, next) => {
+    await providers.socketProvider.disconnectSession(req.session.id)
+
     req.logout((err) => {
         if (err) return next(err)
 

@@ -15,7 +15,7 @@ class SocketProvider extends ProviderService {
                 .timeout(5000)
                 .to(botId.toString())
                 .emitWithAck("stop");
-            
+
             botRep = rep[0];
         } catch (err) {
             this._logInfo(`Le bot ${botId} n'a pas repondu au socket`);
@@ -34,10 +34,34 @@ class SocketProvider extends ProviderService {
             .emit(event, payload);
     }
 
-    emitToBots(event){
+    emitToBots(event) {
         getIO()
             .of("/bots")
             .emit(event)
+    }
+
+    async disconnectSession(sessionId) {
+        try {
+            const sessionSockets = await getIO().of('/panel').in(sessionId).fetchSockets()
+
+            for (const socket of sessionSockets) {
+                socket.disconnect(true)
+            }
+        } catch (err) {
+            this._logError(err)
+        }
+    }
+
+    async disconnectUser(userId) {
+        try {
+            const userSockets = await getIO().of('/panel').in(userId.toString()).fetchSockets()
+
+            for (const socket of userSockets) {
+                socket.disconnect(true)
+            }
+        } catch (err) {
+            this._logError(err)
+        }
     }
 }
 module.exports = SocketProvider;

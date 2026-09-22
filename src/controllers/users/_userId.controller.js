@@ -7,13 +7,13 @@ const getUser = catchAsync(async (req,res,next) => {
 })
 
 const updateUser = catchAsync(async (req,res,next) => {
-    const updatedUser = await userService.manage.updateById(req.ctx.user._id, req.body)
+    const updatedUser = await userService.manage.update(req.ctx.user, req.body)
 
     ApiResponse.ok(res, updatedUser)
 })
 
 const deleteUser = catchAsync(async (req,res,next) => {
-    await userService.manage.deleteById(req.ctx.user._id)
+    await userService.manage.delete(req.ctx.user)
 
     ApiResponse.ok(res, null, "Utilisateur supprimer")
 })

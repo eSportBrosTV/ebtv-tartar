@@ -7,7 +7,7 @@ const getMe = catchAsync(async (req,res,next) => {
 })
 
 const updateMe = catchAsync(async (req,res,next) => {
-    const updatedMe = await userService.manage.updateById(req.user._id, req.body)
+    const updatedMe = await userService.manage.update(req.ctx.user, req.body)
 
     ApiResponse.ok(res, updatedMe)
 })
