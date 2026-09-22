@@ -48,6 +48,7 @@ class DockerProvider extends ProviderService {
                     `TARTAR_TOKEN=${tartarToken}`,
                     `DIS_TOKEN=${disToken}`,
                     `MANAGER_URL=${managerURL}`,
+                    `BOT_VERSION=${version}`
                 ],
                 HostConfig: { 
                     Binds: binds, 
