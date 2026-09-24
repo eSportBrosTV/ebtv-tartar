@@ -7,7 +7,7 @@ const orgaMemberRouter = require("./_orgId.members._memId.routes");
 const policies = require("../../policies");
 const schemas = require("../../schemas");
 
-const orgaMembersCtrl = require("../../controllers/orgas/_orgId.members.controller.js");
+const orgaMembersCtrl = require("../../controllers/orgas/_orgId.members.controller");
 
 const orgaMembersRouter = express.Router({mergeParams: true})
 

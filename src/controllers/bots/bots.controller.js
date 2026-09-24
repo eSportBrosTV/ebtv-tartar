@@ -9,19 +9,15 @@ const getBots = catchAsync(async (req,res,next) => {
 })
 
 const addBot = catchAsync(async (req, res, next) => {
-  const newBot = await botService.manage.create(req.body)
+  const { bot, deployed } = await botService.lifecycle.create(req.body)
 
-  try {
-    await botService.deploy.deployBot(newBot, true)
-
-    ApiResponse.created(res, newBot, "Bot creer et demarer")
-  } catch (err) {
-
-    const response = new ApiResponse(res, 201, newBot, "Bot creer mais non demarer")
+  if (!deployed) {
+    const response = new ApiResponse(res, 201, bot, "Bot creer mais non demarer")
     response.payload.status = "partial";
-    response.send();
-
+    return response.send();
   }
+
+  ApiResponse.created(res, bot, "Bot creer et demarer")
 })
 
 

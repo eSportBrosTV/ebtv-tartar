@@ -22,7 +22,7 @@ const stopBot = catchAsync(async (req, res, next) => {
 });
 
 const destroyBot = catchAsync(async (req, res, next) => {
-    await botService.deploy.destroyBot(req.ctx.bot, req.body.force)
+    await botService.lifecycle.destroy(req.ctx.bot, req.body.force)
     ApiResponse.ok(res, null, "Bot supprimer avec succer")
 });
 

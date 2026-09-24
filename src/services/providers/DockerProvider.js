@@ -17,6 +17,15 @@ class DockerProvider extends ProviderService {
         return `${process.env.BOT_IMAGE_PROD}:${version}`
     }
 
+    async ping() {
+        try {
+            await this.#docker.ping();
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     async getContainers() {
         try {
             const containers = await this.#docker.listContainers({

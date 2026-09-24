@@ -10,9 +10,7 @@ const { connectDB } = require("./config/db");
 const { connectDocker } = require("./config/docker");
 
 const shutdownProccess = require("./utils/shutdownProccess");
-const healthMonitor = require("./services/healthMonitor");
-const healthProccess = require("./utils/healthProccess");
-const { releaseService } = require("./services");
+const { releaseService, systemService } = require("./services");
 
 const server = http.createServer(app);
 
@@ -32,8 +30,7 @@ const startApp = async () => {
 
     await releaseService.syncCatalog()
 
-    healthMonitor.startMonitoring()
-    healthMonitor.on('status_changed', healthProccess)
+    systemService.health.start()
     console.log("[Server] Monitoring lancer")
 
     server.listen(PORT, () => {

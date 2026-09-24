@@ -15,11 +15,11 @@ class BotDeploymentService extends BaseDomainService {
     #socket
     #releaseDb
     /**
-     * 
-     * @param {DataService} botData 
+     *
+     * @param {DataService} botData
      * @param {ReleaseDataService} releaseData
-     * @param {DockerProvider} dockerProvider 
-     * @param {SocketProvider} socketProvider 
+     * @param {DockerProvider} dockerProvider
+     * @param {SocketProvider} socketProvider
      */
     constructor(botData, releaseData, dockerProvider, socketProvider) {
 
@@ -35,7 +35,7 @@ class BotDeploymentService extends BaseDomainService {
 
         const targetVersion = await this.#releaseDb.getLatestRelease()
 
-        const tartarToken = this._generateToken(bot)
+        const tartarToken = this.#generateToken(bot)
 
         const containerId = await this.#docker.createContainer({
             botId: bot._id.toString(),
@@ -44,14 +44,16 @@ class BotDeploymentService extends BaseDomainService {
             version: targetVersion
         })
 
-        bot.containerId = containerId
-        bot.version = targetVersion
+        const deployedBot = await this.#db.updateById(bot._id, {
+            containerId: containerId,
+            version: targetVersion
+        })
 
         if(withStart){
             await this.#docker.startContainer(containerId)
         }
 
-        return await bot.save()
+        return deployedBot
     }
 
     async startBot(botOrId) {
@@ -73,13 +75,16 @@ class BotDeploymentService extends BaseDomainService {
         await this.#docker.stopContainer(bot.containerId);
     }
 
-    async destroyBot(botOrId, force = false) {
+    async destroyContainer(botOrId, force = false) {
         const bot = await this._resolveDocument(this.#db, botOrId);
 
         await this.#socket.emitStopAndWait(bot._id.toString(), force);
         await this.#docker.destroyContainer(bot.containerId);
 
-        await bot.deleteOne(); 
+        return await this.#db.updateById(bot._id, {
+            containerId: null,
+            isOnline: false
+        });
     }
 
     async updateBot(botOrId) {
@@ -89,18 +94,19 @@ class BotDeploymentService extends BaseDomainService {
             this._throwError("Une mise à jour est déjà en cours pour ce bot.", ErrorCodes.BAD_REQUEST);
         }
 
-        bot.updateStatus = 'UPDATING';
-        bot.lastErrorMessage = null;
-        await bot.save();
+        await this.#db.updateById(bot._id, {
+            updateStatus: 'UPDATING',
+            lastErrorMessage: null
+        });
 
-        this._processUpdate(bot).catch(err => {
+        this.#processUpdate(bot).catch(err => {
             this._logError(`Crash process update bot ${bot._id}: ${err.message}`);
         });
 
         return { message: "Mise a jour du bot lance avec succès" };
     }
 
-    async _processUpdate(bot) {
+    async #processUpdate(bot) {
         try {
             this._logInfo(`Debut de la mise a jour pour le bot ${bot._id}`);
 
@@ -109,11 +115,12 @@ class BotDeploymentService extends BaseDomainService {
             await this.#docker.pullImage(targetVersion);
 
             if (bot.containerId) {
-                await this.#socket.emitStopAndWait(bot._id.toString(), true); 
+                await this.#socket.emitStopAndWait(bot._id.toString(), true);
                 await this.#docker.destroyContainer(bot.containerId);
+                await this.#db.updateById(bot._id, { containerId: null });
             }
 
-            const tartarToken = this._generateToken(bot)
+            const tartarToken = this.#generateToken(bot)
 
             const newContainerId = await this.#docker.createContainer({
                 botId: bot._id.toString(),
@@ -122,25 +129,28 @@ class BotDeploymentService extends BaseDomainService {
                 version: targetVersion
             });
 
+            await this.#db.updateById(bot._id, {
+                containerId: newContainerId,
+                version: targetVersion
+            });
+
             await this.#docker.startContainer(newContainerId);
 
-            bot.containerId = newContainerId;
-            bot.updateStatus = 'IDLE';
-            bot.version = targetVersion;
-            await bot.save();
+            await this.#db.updateById(bot._id, { updateStatus: 'IDLE' });
 
             this._logInfo(`Mise à jour réussie pour le bot ${bot._id}`);
 
         } catch (error) {
             this._logError(`Échec mise à jour bot ${bot._id}: ${error.message}`);
-            
-            bot.updateStatus = 'ERROR';
-            bot.lastErrorMessage = error.message;
-            await bot.save();
+
+            await this.#db.updateById(bot._id, {
+                updateStatus: 'ERROR',
+                lastErrorMessage: error.message
+            });
         }
     }
 
-    _generateToken(bot){
+    #generateToken(bot){
         return jwt.sign(
             {
                 orca_id: bot._id.toString(),

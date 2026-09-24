@@ -1,4 +1,4 @@
-const { AssoMember } = require("../../models")
+const { orgaService } = require("../../services")
 const ApiResponse = require("../../utils/ApiResponse")
 const catchAsync = require("../../utils/catchAsync")
 
@@ -7,18 +7,13 @@ const getMember = catchAsync(async (req, res, next) => {
 })
 
 const deleteMember = catchAsync(async (req, res, next) => {
-    const memId = req.ctx.orgaMember.id
-
-    await AssoMember.deleteOne({ _id: memId })
+    await orgaService.members.delete(req.ctx.orgaMember)
 
     ApiResponse.ok(res, null, "Membre supprimer")
 })
 
 const updateMember = catchAsync(async (req, res, next) => {
-    const memId = req.ctx.orgaMember.id
-    const updateData = req.body
-
-    let updatedMember = await AssoMember.findByIdAndUpdate(memId, { $set: updateData }, { new: true })
+    const updatedMember = await orgaService.members.update(req.ctx.orgaMember, req.body)
 
     ApiResponse.ok(res, updatedMember)
 })

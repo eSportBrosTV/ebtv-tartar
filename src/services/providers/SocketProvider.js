@@ -7,6 +7,26 @@ class SocketProvider extends ProviderService {
         super('Socket');
     }
 
+    isReady() {
+        try {
+            return getIO().httpServer?.listening === true;
+        } catch {
+            return false;
+        }
+    }
+
+    disconnectAll() {
+        try {
+            const io = getIO();
+
+            for (const namespace of ["/bots", "/panel"]) {
+                io.of(namespace).disconnectSockets(true);
+            }
+        } catch (err) {
+            this._logError(err);
+        }
+    }
+
     async emitStopAndWait(botId, force = false) {
         let botRep = null;
         try {
