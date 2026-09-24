@@ -1,8 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const session = require('express-session')
-
-const { default: MongoStore } = require('connect-mongo');
 const passport = require('passport');
 
 const healthRouter = require('../routes/health/health.routes');
