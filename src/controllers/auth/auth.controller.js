@@ -11,9 +11,9 @@ const register = catchAsync(async (req, res, next) => {
 const login = catchAsync(async (req, res, next) => {
     req.session.sessionVersion = req.user.sessionVersion
 
-    const { password, ...safeUser } = req.user.toJSON()
+    const user = userService.auth.login(req.user)
 
-    ApiResponse.ok(res, safeUser)
+    ApiResponse.ok(res, user)
 })
 
 const logout = catchAsync(async (req, res, next) => {

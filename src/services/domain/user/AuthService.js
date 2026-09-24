@@ -14,10 +14,17 @@ class AuthService extends BaseDomainService {
     async register(payload){
         const newUser = await this.#userManage.create(payload)
 
-        const safeUser = newUser.toObject()
-        delete safeUser.password
+        this._logInfo(`Nouvel utilisateur : ${newUser.username} (${newUser._id})`)
 
-        this._logInfo(`Nouvel utilisateur : ${safeUser.username} (${safeUser._id})`)
+        return this.#toSafeUser(newUser)
+    }
+
+    login(user){
+        return this.#toSafeUser(user)
+    }
+
+    #toSafeUser(user){
+        const { password, ...safeUser } = user.toJSON()
 
         return safeUser
     }
