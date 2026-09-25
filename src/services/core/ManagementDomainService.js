@@ -15,7 +15,7 @@ class ManagementDomainService extends BaseDomainService {
      */
     constructor(serviceName, dataService) {
         super(serviceName);
-        this.db = dataService;
+        this._db = dataService;
     }
     async _beforeCreate(payload) { 
         return payload; 
@@ -30,11 +30,11 @@ class ManagementDomainService extends BaseDomainService {
     }
 
     async getAll() {
-        return await this.db.find({});
+        return await this._db.find({});
     }
 
     async getById(id) {
-        const doc = await this.db.findById(id);
+        const doc = await this._db.findById(id);
         if (!doc) this._throwError("Document introuvable", ErrorCodes.NOT_FOUND);
         return doc;
     }
@@ -44,28 +44,27 @@ class ManagementDomainService extends BaseDomainService {
         
         this._logInfo("Creation d'un nouveau document");
         
-        return await this.db.create(safePayload);
+        return await this._db.create(safePayload);
     }
 
     async update(idOrDoc, payload) {
-        const doc = await this._resolveDocument(this.db, idOrDoc);
+        const doc = await this._resolveDocument(this._db, idOrDoc);
 
         const safePayload = await this._beforeUpdate(doc, payload);
 
         this._logInfo(`Mise a jour du document ${doc._id}`);
 
-        return await this.db.updateById(doc._id, safePayload);
+        return await this._db.updateById(doc._id, safePayload);
     }
 
     async delete(idOrDoc) {
-        const doc = await this._resolveDocument(this.db, idOrDoc);
-        console.log(doc)
+        const doc = await this._resolveDocument(this._db, idOrDoc);
 
         await this._beforeDelete(doc);
 
         this._logInfo(`Suppression du document ${doc._id}`);
 
-        return await this.db.deleteById(doc._id);
+        return await this._db.deleteById(doc._id);
     }
 }
 

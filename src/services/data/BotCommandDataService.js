@@ -7,11 +7,11 @@ class BotCommandDataService extends DataService {
     }
 
     async findCommandsByBot(botId) {
-        return await this.model.find({ bot_id: botId });
+        return await this.find({ bot_id: botId });
     }
 
     async findCommandsByGlobal(globalCmdId){
-        return await this.model.find({command_id: globalCmdId})
+        return await this.find({command_id: globalCmdId})
     }
 }
 

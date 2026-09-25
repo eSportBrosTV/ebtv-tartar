@@ -20,14 +20,28 @@ class AuthService extends BaseDomainService {
         return this.#toSafeUser(newUser)
     }
 
+    async authenticate(username, password){
+        const user = await this.#userManage.getByUsernameWithPassword(username)
+
+        if(!user || !(await user.correctPassword(password, user.password))){
+            this._throwError("Pseudo ou mot de passe incorrect", ErrorCodes.UNAUTHORIZED)
+        }
+
+        return user
+    }
+
     login(user){
         return this.#toSafeUser(user)
+    }
+
+    isSessionCurrent(user, sessionVersion){
+        return sessionVersion === undefined || sessionVersion === user.sessionVersion
     }
 
     async validateSession(userId, sessionVersion){
         const user = await this.#userManage.getById(userId)
 
-        if(sessionVersion !== undefined && sessionVersion !== user.sessionVersion){
+        if(!this.isSessionCurrent(user, sessionVersion)){
             this._throwError("Session expiree suite a un changement de mot de passe", ErrorCodes.UNAUTHORIZED)
         }
 

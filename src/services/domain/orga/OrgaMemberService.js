@@ -15,7 +15,11 @@ class OrgaMemberService extends ManagementDomainService {
     }
 
     async getAllOfOrga(orgId){
-        return await this.db.findMembersByOrga(orgId)
+        return await this._db.findMembersByOrga(orgId)
+    }
+
+    async getMembership(userId, orgId){
+        return await this._db.findMembership(userId, orgId)
     }
 
     async _beforeCreate(payload){

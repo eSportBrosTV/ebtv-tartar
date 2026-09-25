@@ -9,6 +9,10 @@ class AssoMemberDataService extends DataService {
     async findMembersByOrga(orgId) {
         return await this.find({ orga: orgId });
     }
+
+    async findMembership(userId, orgId) {
+        return await this.findOne({ user: userId, orga: orgId });
+    }
 }
 
 module.exports = AssoMemberDataService

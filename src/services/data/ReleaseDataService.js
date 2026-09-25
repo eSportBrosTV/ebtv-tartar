@@ -7,9 +7,13 @@ class ReleaseDataService extends DataService {
     }
 
     async getLatestRelease() {
-        const latestRel = await this.model.findOne().sort({releaseDate: -1})
+        try {
+            const latestRel = await this.model.findOne().sort({releaseDate: -1})
 
-        return latestRel ? latestRel.version : 'latest'
+            return latestRel ? latestRel.version : 'latest'
+        } catch (error) {
+            this.handleMongoError(error)
+        }
     }
 }
 

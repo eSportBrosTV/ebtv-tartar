@@ -1,4 +1,4 @@
-const { AssoMember } = require("../models");
+const { orgaService } = require("../services");
 const BasePolicy = require("./BasePolicy");
 
 class OrgaPolicies extends BasePolicy {
@@ -11,10 +11,7 @@ class OrgaPolicies extends BasePolicy {
         return this._getCached(req, cacheKey, async () => {
             if (!orgaId) return null;
             
-            return await AssoMember.findOne({ 
-                user: req.user.id, 
-                orga: orgaId 
-            });
+            return await orgaService.members.getMembership(req.user.id, orgaId);
         });
     };
 

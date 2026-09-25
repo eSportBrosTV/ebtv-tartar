@@ -7,7 +7,7 @@ class BotDataService extends DataService {
     }
 
     async findBotByOrga(orgId) {
-        return await this.model.find({ orga: orgId });
+        return await this.find({ orga: orgId });
     }
 }
 

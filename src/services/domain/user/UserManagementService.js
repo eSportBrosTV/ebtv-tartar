@@ -15,6 +15,10 @@ class UserManagementService extends ManagementDomainService {
         this.#socket = socketProvider
     }
 
+    async getByUsernameWithPassword(username){
+        return await this._db.findOne({ username: username }, '+password')
+    }
+
     async update(userOrId, payload){
         const updatedUser = await super.update(userOrId, payload)
 

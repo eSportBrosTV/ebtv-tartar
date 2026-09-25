@@ -19,7 +19,7 @@ class BotCommandService extends ManagementDomainService {
     }
 
     async getAllOfBot(botId){
-        return await this.db.findCommandsByBot(botId)
+        return await this._db.findCommandsByBot(botId)
     }
 
     async create(payload){

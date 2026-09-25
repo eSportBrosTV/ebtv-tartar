@@ -1,4 +1,5 @@
 const ErrorCodes = require('../../utils/errors/ErrorCodes');
+const GlobalError = require('../../utils/errors/GlobalError');
 const BaseService = require('./BaseService');
 
 /**
@@ -53,11 +54,18 @@ class DataService extends BaseService {
 
     /**
      * @param {import('mongoose').QueryFilter<T>} filter
+     * @param {string} [select=null]
      * @returns {Promise<T | null>}
      */
-    async findOne(filter) {
+    async findOne(filter, select = null) {
         try {
-            return await this.model.findOne(filter);
+            let query = this.model.findOne(filter);
+
+            if (select) {
+                query = query.select(select);
+            }
+
+            return await query;
         } catch (error) {
             this.handleMongoError(error);
         }
@@ -164,13 +172,13 @@ class DataService extends BaseService {
             this._throwError(`Erreur de validation : ${messages}`, ErrorCodes.BAD_REQUEST);
         }
 
-        if (error.isOperational) {
+        if (error instanceof GlobalError || error.isOperational) {
             throw error;
         }
 
         console.error(error)
         this._logInfo(`[CRASH MONGOOSE] ${error.message}`);
-        this._throwError("Erreur interne de la base de donnees", ErrorCodes.BAD_REQUEST);
+        this._throwError("Erreur interne de la base de donnees", ErrorCodes.DATABASE_ERROR);
     }
 }
 

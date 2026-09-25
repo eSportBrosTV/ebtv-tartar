@@ -1,3 +1,4 @@
+const { userService } = require("../../services")
 const AppError = require("../../utils/errors/appError")
 
 module.exports = (req,res,next) => {
@@ -14,17 +15,15 @@ module.exports = (req,res,next) => {
         return next(new AppError("Acces refuser, vous n'etes pas connecter", 401))
     }
 
-    if(req.session && req.session.sessionVersion !== undefined){
-        if(req.session.sessionVersion !== req.user.sessionVersion){
-            return req.logout((err) => {
-                if(err) return next(err)
+    if(req.session && !userService.auth.isSessionCurrent(req.user, req.session.sessionVersion)){
+        return req.logout((err) => {
+            if(err) return next(err)
 
-                req.session.destroy(() => {
-                    res.clearCookie('connect.sid', {path: '/'})
-                    return next(new AppError("Votre mot de passe a changer. Veuiller vous reconnecter", 401))
-                })
+            req.session.destroy(() => {
+                res.clearCookie('connect.sid', {path: '/'})
+                return next(new AppError("Votre mot de passe a changer. Veuiller vous reconnecter", 401))
             })
-        }
+        })
     }
 
     next()
