@@ -42,6 +42,10 @@ const botSchema = new mongoose.Schema({
     type: String,
     default: "0.0.1"
   },
+  targetVersion: {
+    type: String,
+    default: null
+  },
   lastErrorMessage: {
     type: String,
     default: null

@@ -40,6 +40,8 @@ class BotDeploymentService extends BaseDomainService {
 
         const tartarToken = this.#auth.generateToken(bot)
 
+        await this.#docker.destroyBotContainer(bot._id)
+
         const containerId = await this.#docker.createContainer({
             botId: bot._id.toString(),
             tartarToken: tartarToken,
@@ -97,31 +99,74 @@ class BotDeploymentService extends BaseDomainService {
             this._throwError("Une mise à jour est déjà en cours pour ce bot.", ErrorCodes.BAD_REQUEST);
         }
 
+        const targetVersion = await this.#releaseDb.getLatestRelease()
+
         await this.#db.updateById(bot._id, {
             updateStatus: 'UPDATING',
-            lastErrorMessage: null
+            lastErrorMessage: null,
+            targetVersion: targetVersion
         });
 
-        this.#processUpdate(bot).catch(err => {
-            this._logError(`Crash process update bot ${bot._id}: ${err.message}`);
-        });
+        this.#launchUpdate(bot, targetVersion);
 
         return { message: "Mise a jour du bot lance avec succès" };
     }
 
-    async #processUpdate(bot) {
-        try {
-            this._logInfo(`Debut de la mise a jour pour le bot ${bot._id}`);
+    async recoverInterruptedUpdates() {
+        const interruptedBots = await this.#db.find({ updateStatus: 'UPDATING' });
 
-            const targetVersion = await this.#releaseDb.getLatestRelease()
+        for (const bot of interruptedBots) {
+            await this.#recoverUpdate(bot);
+        }
+
+        return interruptedBots.length;
+    }
+
+    async #recoverUpdate(bot) {
+        try {
+            const targetVersion = bot.targetVersion || await this.#releaseDb.getLatestRelease();
+            const container = await this.#docker.inspectBotContainer(bot._id);
+
+            if (container?.running && container.version === targetVersion) {
+                await this.#db.updateById(bot._id, {
+                    containerId: container.id,
+                    version: targetVersion,
+                    updateStatus: 'IDLE',
+                    targetVersion: null
+                });
+
+                this._logInfo(`Mise a jour du bot ${bot._id} deja terminee, statut synchronise`);
+                return;
+            }
+
+            this._logInfo(`Reprise de la mise a jour interrompue du bot ${bot._id} vers ${targetVersion}`);
+            this.#launchUpdate(bot, targetVersion);
+
+        } catch (error) {
+            this._logError(`Impossible de reprendre la mise a jour du bot ${bot._id}: ${error.message}`);
+
+            await this.#db.updateById(bot._id, {
+                updateStatus: 'ERROR',
+                lastErrorMessage: error.message
+            });
+        }
+    }
+
+    #launchUpdate(bot, targetVersion) {
+        this.#processUpdate(bot, targetVersion).catch(err => {
+            this._logError(`Crash process update bot ${bot._id}: ${err.message}`);
+        });
+    }
+
+    async #processUpdate(bot, targetVersion) {
+        try {
+            this._logInfo(`Debut de la mise a jour vers ${targetVersion} pour le bot ${bot._id}`);
 
             await this.#docker.pullImage(targetVersion);
 
-            if (bot.containerId) {
-                await this.#socket.emitStopAndWait(bot._id.toString(), true);
-                await this.#docker.destroyContainer(bot.containerId);
-                await this.#db.updateById(bot._id, { containerId: null });
-            }
+            await this.#socket.emitStopAndWait(bot._id.toString(), true);
+            await this.#docker.destroyBotContainer(bot._id);
+            await this.#db.updateById(bot._id, { containerId: null });
 
             const tartarToken = this.#auth.generateToken(bot)
 
@@ -139,7 +184,10 @@ class BotDeploymentService extends BaseDomainService {
 
             await this.#docker.startContainer(newContainerId);
 
-            await this.#db.updateById(bot._id, { updateStatus: 'IDLE' });
+            await this.#db.updateById(bot._id, {
+                updateStatus: 'IDLE',
+                targetVersion: null
+            });
 
             this._logInfo(`Mise à jour réussie pour le bot ${bot._id}`);
 

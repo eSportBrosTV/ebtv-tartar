@@ -29,6 +29,9 @@ const startApp = async () => {
 
     await releaseService.syncCatalog()
 
+    await botService.deploy.recoverInterruptedUpdates();
+    console.log("[Server] Mises a jour interrompues verifiees");
+
     systemService.health.start()
     console.log("[Server] Monitoring lancer")
 

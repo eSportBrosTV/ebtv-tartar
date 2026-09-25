@@ -17,6 +17,10 @@ class DockerProvider extends ProviderService {
         return `${process.env.BOT_IMAGE_PROD}:${version}`
     }
 
+    #containerName(botId){
+        return `bot_${botId}`
+    }
+
     async ping() {
         try {
             await this.#docker.ping();
@@ -48,11 +52,11 @@ class DockerProvider extends ProviderService {
             const cmd = this.#env === "dev" ? ["sh", "-c", "npm install && node src/server.js"] : undefined;
             const managerURL = this.#env === "prod" ? process.env.MANAGER_PUBLIC_URL : "http://host.docker.internal:3000";
 
-            this._logInfo(`Creation du conteneur bot_${botId}`);
+            this._logInfo(`Creation du conteneur ${this.#containerName(botId)}`);
 
             const container = await this.#docker.createContainer({
                 Image: imageToUse,
-                name: `bot_${botId}`,
+                name: this.#containerName(botId),
                 Env: [
                     `TARTAR_TOKEN=${tartarToken}`,
                     `DIS_TOKEN=${disToken}`,
@@ -117,8 +121,30 @@ class DockerProvider extends ProviderService {
             this._logInfo(`Conteneur ${containerId} détruit`);
             return true;
         } catch (err) {
+            if (err.statusCode === 404) return true;
+
             this._logInfo(`Impossible de detruire ${containerId} : ${err.message}`);
             return false;
+        }
+    }
+
+    async destroyBotContainer(botId) {
+        return await this.destroyContainer(this.#containerName(botId));
+    }
+
+    async inspectBotContainer(botId) {
+        try {
+            const info = await this.#docker.getContainer(this.#containerName(botId)).inspect();
+            const versionEnv = (info.Config.Env || []).find(env => env.startsWith("BOT_VERSION="));
+
+            return {
+                id: info.Id,
+                running: info.State.Running,
+                version: versionEnv ? versionEnv.split("=")[1] : null
+            };
+        } catch (err) {
+            if (err.statusCode === 404) return null;
+            this._throwError(`Erreur inspection Docker : ${err.message}`, ErrorCodes.PROVIDER_ERROR);
         }
     }
 
