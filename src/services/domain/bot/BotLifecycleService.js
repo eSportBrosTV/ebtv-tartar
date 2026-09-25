@@ -25,7 +25,9 @@ class BotLifecycleService extends BaseDomainService {
         } catch (err) {
             this._logError(`Bot ${newBot._id} creer mais non deployer : ${err.message}`)
 
-            return { bot: newBot, deployed: false }
+            const bot = await this.#manage.getById(newBot._id)
+
+            return { bot: bot, deployed: false }
         }
     }
 

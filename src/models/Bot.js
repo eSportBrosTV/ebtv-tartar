@@ -9,6 +9,7 @@ const botSchema = new mongoose.Schema({
   token: {
     type: String,
     required: true,
+    select: false,
   },
   serv: {
     type: String,

@@ -6,6 +6,13 @@ const getBot = catchAsync(async (req, res,next) => {
     ApiResponse.ok(res, req.ctx.bot)
 })
 
+const getBotToken = catchAsync(async (req, res, next) => {
+    const token = await botService.manage.getDiscordToken(req.ctx.bot)
+
+    res.set('Cache-Control', 'no-store')
+    ApiResponse.ok(res, { token })
+})
+
 const updateBot = catchAsync(async (req,res,next) => {
     const updatedBot = await botService.manage.update(req.ctx.bot, req.body)
     ApiResponse.ok(res, updatedBot)
@@ -36,6 +43,7 @@ module.exports = {
     stopBot,
     destroyBot,
     getBot,
+    getBotToken,
     updateBot,
     updateImageBot
 }

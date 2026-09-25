@@ -19,6 +19,17 @@ class BotManagementService extends ManagementDomainService {
         this.#socket = socketProvider
     }
 
+    async getDiscordToken(botOrId){
+        const botId = botOrId?._id || botOrId
+        const bot = await this._db.findById(botId, '+token')
+
+        if(!bot){
+            this._throwError("Bot introuvable", ErrorCodes.NOT_FOUND)
+        }
+
+        return bot.token
+    }
+
     async _beforeCreate(payload){
         payload.isOnline = false
         payload.requireFirstDeploy = true

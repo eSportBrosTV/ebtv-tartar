@@ -45,7 +45,7 @@ class BotDeploymentService extends BaseDomainService {
         const containerId = await this.#docker.createContainer({
             botId: bot._id.toString(),
             tartarToken: tartarToken,
-            disToken: bot.token,
+            disToken: await this.#getDiscordToken(bot._id),
             version: targetVersion
         })
 
@@ -173,7 +173,7 @@ class BotDeploymentService extends BaseDomainService {
             const newContainerId = await this.#docker.createContainer({
                 botId: bot._id.toString(),
                 tartarToken: tartarToken,
-                disToken: bot.token,
+                disToken: await this.#getDiscordToken(bot._id),
                 version: targetVersion
             });
 
@@ -199,6 +199,16 @@ class BotDeploymentService extends BaseDomainService {
                 lastErrorMessage: error.message
             });
         }
+    }
+
+    async #getDiscordToken(botId) {
+        const bot = await this.#db.findById(botId, '+token');
+
+        if (!bot) {
+            this._throwError(`Le bot ${botId} n'existe pas`, ErrorCodes.NOT_FOUND);
+        }
+
+        return bot.token;
     }
 
     async markFirstDeployDone(botId) {

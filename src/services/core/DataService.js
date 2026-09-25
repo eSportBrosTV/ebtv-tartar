@@ -16,11 +16,18 @@ class DataService extends BaseService {
 
     /**
      * @param {string} id
+     * @param {string} [select=null]
      * @returns {Promise<T | null>}
      */
-    async findById(id) {
+    async findById(id, select = null) {
         try {
-            return await this.model.findById(id);
+            let query = this.model.findById(id);
+
+            if (select) {
+                query = query.select(select);
+            }
+
+            return await query;
         } catch (error) {
             this.handleMongoError(error);
         }
