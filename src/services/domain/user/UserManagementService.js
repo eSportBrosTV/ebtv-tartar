@@ -15,6 +15,16 @@ class UserManagementService extends ManagementDomainService {
         this.#socket = socketProvider
     }
 
+    async update(userOrId, payload){
+        const updatedUser = await super.update(userOrId, payload)
+
+        if(payload.password){
+            this.#socket.disconnectUser(updatedUser._id)
+        }
+
+        return updatedUser
+    }
+
     async delete(userOrId){
         const deletedUser = await super.delete(userOrId)
 

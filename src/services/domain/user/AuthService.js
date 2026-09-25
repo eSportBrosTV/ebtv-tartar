@@ -1,3 +1,4 @@
+const ErrorCodes = require("../../../utils/errors/ErrorCodes");
 const BaseDomainService = require("../../core/BaseDomainService");
 
 class AuthService extends BaseDomainService {
@@ -21,6 +22,16 @@ class AuthService extends BaseDomainService {
 
     login(user){
         return this.#toSafeUser(user)
+    }
+
+    async validateSession(userId, sessionVersion){
+        const user = await this.#userManage.getById(userId)
+
+        if(sessionVersion !== undefined && sessionVersion !== user.sessionVersion){
+            this._throwError("Session expiree suite a un changement de mot de passe", ErrorCodes.UNAUTHORIZED)
+        }
+
+        return user
     }
 
     #toSafeUser(user){

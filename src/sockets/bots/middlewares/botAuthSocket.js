@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken")
+const { botService } = require("../../../services");
 
 module.exports = async (socket, next) => {
     const token = socket.handshake.auth.token;
@@ -11,11 +11,11 @@ module.exports = async (socket, next) => {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
-      socket.orcaId = decoded.orca_id
+      socket.orcaId = await botService.auth.verifyToken(token)
     } catch (error) {
+      console.log(`[Socket] Connexion refuser : ${error.message}`);
       return next(new Error("Acces refuse : Token corrompu ou invalide"));
     }
-    
-    next(); 
+
+    next();
 }

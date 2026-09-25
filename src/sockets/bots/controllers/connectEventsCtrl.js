@@ -1,22 +1,19 @@
-const { Bot } = require("../../../models");
+const { botService } = require("../../../services");
+const socketCatch = require("../../../utils/socketCatch");
 
-const setOnlineStatus = async (orcaId, isOnline) => {
-    try {
-        await Bot.findByIdAndUpdate(orcaId, { isOnline });
-    } catch (error) {
-        console.error(`[Socket] Erreur maj statut (isOnline: ${isOnline}) :`, error);
-    }
-}
+const handleConnect = socketCatch(async (socket) => {
+    console.log(`[Socket] Bot connecte | Orca ID : ${socket.orcaId} | Socket ID : ${socket.id}`);
 
-const handleDisconect = async (socket, reason) => {
-    console.log(
-        `[Socket] Bot deconnecte | Orga ID : ${socket.orcaId} | Raison : ${reason}`
-      );
+    await botService.presence.markOnline(socket.orcaId)
+})
 
-    setOnlineStatus(socket.orcaId, false)
-}
+const handleDisconnect = socketCatch(async (socket, reason) => {
+    console.log(`[Socket] Bot deconnecte | Orca ID : ${socket.orcaId} | Raison : ${reason}`);
+
+    await botService.presence.markOffline(socket.orcaId)
+})
 
 module.exports = {
-    setOnlineStatus,
-    handleDisconect
+    handleConnect,
+    handleDisconnect
 }

@@ -6,12 +6,14 @@ const BotCommandDataService = require("./data/BotCommandDataService");
 const BotDataService = require("./data/BotDataService");
 const OrgaDataService = require("./data/OrgaDataService");
 const ReleaseDataService = require("./data/ReleaseDataService");
+const BotAuthService = require("./domain/bot/BotAuthService");
 const BotCommandService = require("./domain/bot/BotCommandService");
 const BotConfigService = require("./domain/bot/BotConfigService");
 
 const BotDeploymentService = require("./domain/bot/BotDeploymentService");
 const BotLifecycleService = require("./domain/bot/BotLifecycleService");
 const BotManagementService = require("./domain/bot/BotManagementService");
+const BotPresenceService = require("./domain/bot/BotPresenceService");
 const CommandManagementService = require("./domain/command/CommandManagementService");
 const OrgaManagementService = require("./domain/orga/OrgaManagementService");
 const OrgaMemberService = require("./domain/orga/OrgaMemberService");
@@ -39,10 +41,14 @@ const socketProvider = new SocketProvider()
 const databaseProvider = new DatabaseProvider()
 const discordWebhookProvider = new DiscordWebhookProvider()
 
-const botDeployment = new BotDeploymentService(botData, releaseData, dockerProvider, socketProvider)
+const botAuth = new BotAuthService(botData)
 const botConfig = new BotConfigService(botData, orgaData, commandData, botCommandData)
+
+const botDeployment = new BotDeploymentService(botData, releaseData, botAuth, dockerProvider, socketProvider)
 const botManagement = new BotManagementService(botData, botConfig, socketProvider)
 const botCommand = new BotCommandService(botCommandData, botConfig, socketProvider)
+const botPresence = new BotPresenceService(botData, socketProvider)
+
 const botLifecycle = new BotLifecycleService(botManagement, botDeployment)
 
 const userManagement = new UserManagementService(userData, socketProvider)
@@ -62,7 +68,9 @@ const botService = {
     manage: botManagement,
     config: botConfig,
     commands: botCommand,
-    lifecycle: botLifecycle
+    lifecycle: botLifecycle,
+    auth: botAuth,
+    presence: botPresence
 }
 
 const userService = {

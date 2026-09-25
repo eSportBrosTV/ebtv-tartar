@@ -1,9 +1,9 @@
-const { Bot } = require("../models")
+const { botService } = require("../services")
 
 module.exports = async () => {
     console.log("[Stop] Arret en cours..")
 
-    await Bot.updateMany({}, {isOnline: false})
+    await botService.presence.resetAll()
 
     process.exit(0)
 }

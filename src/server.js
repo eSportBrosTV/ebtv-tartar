@@ -1,6 +1,5 @@
 require("dotenv").config();
 const http = require("http");
-const { Bot } = require("./models");
 
 const PORT = process.env.PORT || 3000;
 
@@ -10,7 +9,7 @@ const { connectDB } = require("./config/db");
 const { connectDocker } = require("./config/docker");
 
 const shutdownProccess = require("./utils/shutdownProccess");
-const { releaseService, systemService } = require("./services");
+const { botService, releaseService, systemService } = require("./services");
 
 const server = http.createServer(app);
 
@@ -25,7 +24,7 @@ const startApp = async () => {
 
     socket.init(server);
 
-    await Bot.updateMany({}, { isOnline: false });
+    await botService.presence.resetAll();
     console.log("[Server] Statut des bot initialiser");
 
     await releaseService.syncCatalog()

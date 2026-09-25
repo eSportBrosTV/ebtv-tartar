@@ -3,29 +3,32 @@ const ErrorCodes = require('../../../utils/errors/ErrorCodes');
 const BaseDomainService = require('../../core/BaseDomainService');
 
 
-const jwt = require("jsonwebtoken");
 const DataService = require('../../core/DataService');
 const DockerProvider = require('../../providers/DockerProvider');
 const SocketProvider = require('../../providers/SocketProvider');
 const ReleaseDataService = require('../../data/ReleaseDataService');
+const BotAuthService = require('./BotAuthService');
 
 class BotDeploymentService extends BaseDomainService {
     #db
     #docker
     #socket
     #releaseDb
+    #auth
     /**
      *
      * @param {DataService} botData
      * @param {ReleaseDataService} releaseData
+     * @param {BotAuthService} botAuth
      * @param {DockerProvider} dockerProvider
      * @param {SocketProvider} socketProvider
      */
-    constructor(botData, releaseData, dockerProvider, socketProvider) {
+    constructor(botData, releaseData, botAuth, dockerProvider, socketProvider) {
 
         super('BotDeployment');
         this.#db = botData;
         this.#releaseDb = releaseData
+        this.#auth = botAuth
         this.#docker = dockerProvider;
         this.#socket = socketProvider;
     }
@@ -35,7 +38,7 @@ class BotDeploymentService extends BaseDomainService {
 
         const targetVersion = await this.#releaseDb.getLatestRelease()
 
-        const tartarToken = this.#generateToken(bot)
+        const tartarToken = this.#auth.generateToken(bot)
 
         const containerId = await this.#docker.createContainer({
             botId: bot._id.toString(),
@@ -120,7 +123,7 @@ class BotDeploymentService extends BaseDomainService {
                 await this.#db.updateById(bot._id, { containerId: null });
             }
 
-            const tartarToken = this.#generateToken(bot)
+            const tartarToken = this.#auth.generateToken(bot)
 
             const newContainerId = await this.#docker.createContainer({
                 botId: bot._id.toString(),
@@ -150,14 +153,8 @@ class BotDeploymentService extends BaseDomainService {
         }
     }
 
-    #generateToken(bot){
-        return jwt.sign(
-            {
-                orca_id: bot._id.toString(),
-                created_at: Date.now(),
-            },
-            process.env.JWT_SECRET
-        )
+    async markFirstDeployDone(botId) {
+        await this.#db.updateById(botId, { requireFirstDeploy: false });
     }
 }
 module.exports = BotDeploymentService;

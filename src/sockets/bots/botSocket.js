@@ -1,23 +1,19 @@
-const { handleDeployementDone, handleConfigRequest } = require("./controllers/botEventsCtrl");
-const { handleDisconect, setOnlineStatus } = require("./controllers/connectEventsCtrl");
+const { handleDeploymentDone, handleConfigRequest } = require("./controllers/botEventsCtrl");
+const { handleConnect, handleDisconnect } = require("./controllers/connectEventsCtrl");
 const botAuthSocket = require("./middlewares/botAuthSocket");
-const isHealthConnect = require("./middlewares/isHealthConnect");
+const isHealthConnect = require("../common/middlewares/isHealthConnect");
 
 module.exports = (io) => {
   io.use(isHealthConnect)
   io.use(botAuthSocket);
 
   io.on("connection", (socket) => {
-    console.log(`[Socket] Bot connecté | Orca ID : ${socket.orcaId} | Socket ID : ${socket.id}`);
-
     socket.join(socket.orcaId);
 
-    console.log(`[Socket] Bot connecte à la room : ${socket.orcaId}`);
-
-    socket.on('deployment_done', () => handleDeployementDone(socket))
+    socket.on('deployment_done', () => handleDeploymentDone(socket))
     socket.on('request_config', () => handleConfigRequest(socket))
-    socket.on('disconnect', (reason) => handleDisconect(socket, reason))
+    socket.on('disconnect', (reason) => handleDisconnect(socket, reason))
 
-    setOnlineStatus(socket.orcaId, true)
+    handleConnect(socket)
   });
 };

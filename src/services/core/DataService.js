@@ -114,6 +114,23 @@ class DataService extends BaseService {
     }
 
     /**
+     * @param {import('mongoose').QueryFilter<T>} filter
+     * @param {import('mongoose').UpdateQuery<T>} payload
+     * @param {import('mongoose').ClientSession} [session=null]
+     */
+    async updateMany(filter, payload, session = null) {
+        try {
+            return await this.model.updateMany(
+                filter,
+                { $set: payload },
+                { runValidators: true, session }
+            );
+        } catch (error) {
+            this.handleMongoError(error);
+        }
+    }
+
+    /**
      * @param {string} id
      * @param {import('mongoose').ClientSession} [session=null]
      * @returns {Promise<T>}

@@ -1,9 +1,12 @@
 const sessionMiddleware = require("../../config/session")
-const { handleDiconnect } = require("./controllers/connectEventCtrl")
+const { handleDisconnect } = require("./controllers/connectEventCtrl")
 const panelAuthSocket = require("./middlewares/panelAuthSocket")
 const verifSession = require("./middlewares/verifSession")
+const isHealthConnect = require("../common/middlewares/isHealthConnect")
 
 module.exports = (io) => {
+    io.use(isHealthConnect)
+
     io.use((socket, next) => {
         sessionMiddleware(socket.request, socket.request.res || {}, next)
     })
@@ -18,6 +21,6 @@ module.exports = (io) => {
 
         socket.use(verifSession(socket))
 
-        socket.on("disconnect", (reason) => handleDiconnect(socket, reason))
+        socket.on("disconnect", (reason) => handleDisconnect(socket, reason))
     })
 }

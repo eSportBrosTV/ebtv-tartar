@@ -1,4 +1,4 @@
-const handleDiconnect = (socket, reason) => {
+const handleDisconnect = (socket, reason) => {
     if(socket.sessionTimer){
         clearTimeout(socket.sessionTimer)
     }
@@ -7,5 +7,5 @@ const handleDiconnect = (socket, reason) => {
 }
 
 module.exports = {
-    handleDiconnect
+    handleDisconnect
 }

@@ -25,7 +25,6 @@ class BotConfigService extends BaseDomainService {
 
     async generateConfig(botOrId) {
         const bot = await this._resolveDocument(this.#botDb, botOrId);
-        console.log(bot)
         this._logInfo(`Generation de la configuration pour le bot ${bot._id}`);
 
         const orga = await this.#orgaDb.findById(bot.orga);

@@ -21,6 +21,7 @@ const handleValidationErrorDB = err => {
 const translateGlobalError = (code) => {
     switch (code) {
         case ErrorCodes.BAD_REQUEST: return 400;
+        case ErrorCodes.UNAUTHORIZED: return 401;
         case ErrorCodes.NOT_FOUND: return 404;
         
         case ErrorCodes.CONFLICT:

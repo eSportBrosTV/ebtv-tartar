@@ -15,6 +15,16 @@ class SocketProvider extends ProviderService {
         }
     }
 
+    async isBotConnected(botId) {
+        try {
+            const sockets = await getIO().of("/bots").in(botId.toString()).fetchSockets();
+            return sockets.length > 0;
+        } catch (err) {
+            this._logError(err);
+            return false;
+        }
+    }
+
     disconnectAll() {
         try {
             const io = getIO();
