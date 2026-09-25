@@ -2,6 +2,7 @@ module.exports = {
   //Auth
   auth: require("./auth/auth"),
   authorize: require("./auth/authorize"),
+  loginLimiter: require("./auth/loginLimiter"),
 
   //Core
   errorHandler: require("./core/errorHadler"),
