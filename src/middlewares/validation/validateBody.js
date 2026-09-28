@@ -1,10 +1,13 @@
 const AppError = require("../../utils/errors/appError")
+const zodErrorDetails = require("../../utils/errors/zodErrorDetails")
 
 module.exports = (schema) => (req,res,next) => {
-    try{
-        req.body = schema.parse(req.body)
-        next()
-    } catch(err) {
-        throw new AppError("Corp de requete invalide", 400)
+    const result = schema.safeParse(req.body)
+
+    if (!result.success) {
+        throw new AppError("Corp de requete invalide", 400, zodErrorDetails(result.error))
     }
+
+    req.body = result.data
+    next()
 }

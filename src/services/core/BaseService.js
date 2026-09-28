@@ -14,8 +14,8 @@ class BaseService{
         console.error(`[${this.#serviceName}]`, message)
     }
 
-    _throwError(message, code) {
-        throw new GlobalError(`[${this.#serviceName}] ${message}`, code);
+    _throwError(message, code, details) {
+        throw new GlobalError(`[${this.#serviceName}] ${message}`, code, details);
     }
 }
 

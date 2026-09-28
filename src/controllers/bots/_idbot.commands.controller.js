@@ -11,7 +11,7 @@ const addCommand = catchAsync(async (req,res,next) => {
 })
 
 const getCommands = catchAsync(async (req,res,next) => {
-    const commands = await botService.commands.getAllOfBot(req.ctx.bot._id)
+    const commands = await botService.config.getCommandsOverview(req.ctx.bot)
     ApiResponse.ok(res, commands)
 })
 

@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("./config/zod");
 const http = require("http");
 
 const PORT = process.env.PORT || 3000;

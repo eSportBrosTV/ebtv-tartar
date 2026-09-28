@@ -2,7 +2,9 @@ const BaseDomainService = require('../../core/BaseDomainService');
 const ErrorCodes = require('../../../utils/errors/ErrorCodes');
 const BotDataService = require('../../data/BotDataService');
 const OrgaDataService = require('../../data/OrgaDataService');
+const BotCommandDataService = require('../../data/BotCommandDataService');
 const DataService = require('../../core/DataService');
+const { resolve } = require('../../../utils/commandParams');
 
 class BotConfigService extends BaseDomainService {
     #botDb
@@ -10,10 +12,10 @@ class BotConfigService extends BaseDomainService {
     #commandDb
     #botCommandDb
     /**
-     * @param {BotDataService} botData 
-     * @param {OrgaDataService} orgaData 
-     * @param {DataService} commandData 
-     * @param {DataService} botCommandData 
+     * @param {BotDataService} botData
+     * @param {OrgaDataService} orgaData
+     * @param {DataService} commandData
+     * @param {BotCommandDataService} botCommandData
      */
     constructor(botData, orgaData, commandData, botCommandData) {
         super('BotConfig');
@@ -30,45 +32,7 @@ class BotConfigService extends BaseDomainService {
         const orga = await this.#orgaDb.findById(bot.orga);
         if (!orga) this._throwError("Orga introuvable", ErrorCodes.NOT_FOUND);
 
-        const [commandGlobal, botConfigCommand] = await Promise.all([
-            this.#commandDb.find(),
-            this.#botCommandDb.find({ bot_id: bot._id })
-        ]);
-
-        const commandConfigured = {};
-        for (const cmd of botConfigCommand) {
-            commandConfigured[cmd.command_id] = cmd;
-        }
-
-        const commandList = [];
-        for (const command of commandGlobal) {
-            if (!command.active) continue;
-
-            let commandToPush = {
-                id: command.internalID,
-                metadata: {
-                    name: command.name,
-                    description: command.description,
-                    active: command.active,
-                    params: command.params || {},
-                },
-            };
-
-            const configuredVersion = commandConfigured[command._id];
-
-            if (configuredVersion) {
-                commandToPush.metadata.params = {
-                    ...commandToPush.metadata.params,
-                    ...(configuredVersion.params || {}),
-                };
-
-                if (configuredVersion.active !== undefined) {
-                    commandToPush.metadata.active = configuredVersion.active;
-                }
-            }
-
-            commandList.push(commandToPush);
-        }
+        const states = await this.#computeCommandStates(bot);
 
         return {
             id: bot._id,
@@ -79,8 +43,58 @@ class BotConfigService extends BaseDomainService {
             serv: bot.serv,
             logChannel: bot.logChannel,
             requireFirstDeploy: bot.requireFirstDeploy,
-            commands: commandList,
+            commands: states.map(({ command, resolved }) => ({
+                id: command.internalID,
+                metadata: {
+                    name: command.name,
+                    description: command.description,
+                    active: resolved.active,
+                    params: resolved.params,
+                },
+            })),
         };
+    }
+
+    async getCommandsOverview(botOrId) {
+        const bot = await this._resolveDocument(this.#botDb, botOrId);
+        const states = await this.#computeCommandStates(bot);
+
+        return states.map(({ command, botCommand, resolved, missing, invalid }) => ({
+            commandId: command._id,
+            botCommand: botCommand && {
+                _id: botCommand._id,
+                active: botCommand.active,
+                params: botCommand.params,
+            },
+            resolved,
+            missing,
+            invalid,
+        }));
+    }
+
+    async #computeCommandStates(bot) {
+        const [commands, botCommands] = await Promise.all([
+            this.#commandDb.find({ active: true }),
+            this.#botCommandDb.findCommandsByBot(bot._id)
+        ]);
+
+        const botCommandByCommand = new Map(botCommands.map((botCommand) => [String(botCommand.command_id), botCommand]));
+
+        return commands.map((command) => {
+            const botCommand = botCommandByCommand.get(String(command._id)) ?? null;
+            const { values, missing, invalid } = resolve(command.paramDefs, botCommand?.params);
+
+            return {
+                command,
+                botCommand,
+                resolved: {
+                    active: (botCommand?.active ?? true) && missing.length === 0,
+                    params: values,
+                },
+                missing,
+                invalid,
+            };
+        });
     }
 }
 

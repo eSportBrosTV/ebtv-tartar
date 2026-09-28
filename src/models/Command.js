@@ -1,5 +1,43 @@
 const mongoose = require("mongoose");
 
+const paramDefSchema = new mongoose.Schema(
+  {
+    key: {
+        type: String,
+        required: true
+    },
+    label: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    required: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    multiple: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    default: {
+        type: mongoose.Schema.Types.Mixed
+    },
+    constraints: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    }
+  },
+  { _id: false }
+);
+
 const commandSchema = new mongoose.Schema(
   {
     internalID: {
@@ -20,10 +58,9 @@ const commandSchema = new mongoose.Schema(
         required: true,
         default: true
     },
-    params: {
-        type: mongoose.Schema.Types.Mixed,
-        required: true,
-        default: {}
+    paramDefs: {
+        type: [paramDefSchema],
+        default: []
     }
   }
 );

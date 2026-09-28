@@ -46,7 +46,7 @@ const botConfig = new BotConfigService(botData, orgaData, commandData, botComman
 
 const botDeployment = new BotDeploymentService(botData, releaseData, botAuth, dockerProvider, socketProvider)
 const botManagement = new BotManagementService(botData, botConfig, socketProvider)
-const botCommand = new BotCommandService(botCommandData, botConfig, socketProvider)
+const botCommand = new BotCommandService(botCommandData, commandData, botConfig, socketProvider)
 const botPresence = new BotPresenceService(botData, socketProvider)
 
 const botLifecycle = new BotLifecycleService(botManagement, botDeployment)

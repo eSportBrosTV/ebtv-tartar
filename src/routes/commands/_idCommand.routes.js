@@ -1,9 +1,10 @@
 const express = require("express")
 
 const commandCtrl = require("../../controllers/commands/_idCommand.controller")
-const { injectCtx, validateBody } = require("../../middlewares")
+const { injectCtx, validateBody, authorize } = require("../../middlewares")
 const { Command } = require("../../models")
 const schemas = require("../../schemas")
+const policies = require("../../policies")
 
 const commandRouter = express.Router({mergeParams: true})
 
@@ -18,7 +19,7 @@ commandRouter.use(
 )
 
 commandRouter.get("/", commandCtrl.getCommand)
-commandRouter.patch("/", validateBody(schemas.commands.update), commandCtrl.updateCommand)
-commandRouter.delete("/", commandCtrl.deleteCommand)
+commandRouter.patch("/", authorize(policies.admin.isAdmin), validateBody(schemas.commands.update), commandCtrl.updateCommand)
+commandRouter.delete("/", authorize(policies.admin.isAdmin), commandCtrl.deleteCommand)
 
 module.exports = commandRouter

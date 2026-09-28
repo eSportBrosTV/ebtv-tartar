@@ -54,6 +54,7 @@ module.exports = (err, req, res, next) => {
         res.status(err.statusCode).json({
             status: err.status,
             code: err.code || undefined,
+            details: err.details,
             error: err,
             message: err.message,
             stack: err.stack
@@ -71,7 +72,8 @@ module.exports = (err, req, res, next) => {
             res.status(error.statusCode).json({
                 status: error.status,
                 code: error.code || undefined,
-                message: error.message
+                message: error.message,
+                details: error.details
             });
         } else {
             console.error('ERREUR NON PRÉVUE :', err);

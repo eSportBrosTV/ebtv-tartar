@@ -11,10 +11,10 @@ const commandsCtrl = require("../../controllers/commands/commands.controller")
 
 const commandsRouter = express.Router()
 
-commandsRouter.use(auth, authorize(policies.admin.isAdmin))
+commandsRouter.use(auth)
 
 commandsRouter.get("/", commandsCtrl.getCommands)
-commandsRouter.post("/", validateBody(schemas.commands.create), commandsCtrl.addCommand)
+commandsRouter.post("/", authorize(policies.admin.isAdmin), validateBody(schemas.commands.create), commandsCtrl.addCommand)
 
 commandsRouter.use("/:idCommand", commandRouter)
 
