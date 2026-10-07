@@ -5,6 +5,8 @@ const OrgaDataService = require('../../data/OrgaDataService');
 const BotCommandDataService = require('../../data/BotCommandDataService');
 const DataService = require('../../core/DataService');
 const { resolve } = require('../../../utils/commandParams');
+const zodErrorDetails = require('../../../utils/errors/zodErrorDetails');
+const { getPlatform } = require('../../../platforms');
 
 class BotConfigService extends BaseDomainService {
     #botDb
@@ -32,7 +34,10 @@ class BotConfigService extends BaseDomainService {
         const orga = await this.#orgaDb.findById(bot.orga);
         if (!orga) this._throwError("Orga introuvable", ErrorCodes.NOT_FOUND);
 
-        const states = await this.#computeCommandStates(bot);
+        const [states, platformState] = await Promise.all([
+            this.#computeCommandStates(bot),
+            this.#computePlatformState(bot)
+        ]);
 
         return {
             id: bot._id,
@@ -52,6 +57,65 @@ class BotConfigService extends BaseDomainService {
                     params: resolved.params,
                 },
             })),
+            tournament: this.#toTournament(platformState),
+        };
+    }
+
+    async getPlatformChoice(botOrId) {
+        const bot = await this._resolveDocument(this.#botDb, botOrId);
+        const state = await this.#computePlatformState(bot);
+
+        if (!state) {
+            return { platformId: null, params: {}, secretsSet: [] };
+        }
+
+        const { choice, secretKeys, errors } = state;
+
+        return {
+            platformId: choice.id,
+            params: Object.fromEntries(Object.entries(choice.params ?? {}).filter(([key]) => !secretKeys.has(key))),
+            secretsSet: Object.keys(choice.secrets ?? {}).filter((key) => secretKeys.has(key)),
+            ...(errors.length > 0 && { errors }),
+        };
+    }
+
+    #toTournament(state) {
+        if (!state?.values) return null;
+
+        const { choice, secretKeys, values } = state;
+        const entries = Object.entries(values);
+
+        return {
+            provider: choice.id,
+            params: Object.fromEntries(entries.filter(([key]) => !secretKeys.has(key))),
+            secrets: Object.fromEntries(entries.filter(([key]) => secretKeys.has(key))),
+        };
+    }
+
+    async #computePlatformState(bot) {
+        const stored = await this.#botDb.findById(bot._id, '+platform.secrets');
+        const choice = stored?.platform;
+
+        if (!choice?.id) return null;
+
+        const platform = getPlatform(choice.id);
+
+        if (!platform) {
+            return {
+                choice,
+                secretKeys: new Set(),
+                values: null,
+                errors: [{ path: 'platformId', message: `Plateforme inconnue : ${choice.id}` }],
+            };
+        }
+
+        const result = platform.schema.safeParse({ ...choice.params, ...choice.secrets });
+
+        return {
+            choice,
+            secretKeys: platform.secretKeys,
+            values: result.success ? result.data : null,
+            errors: result.success ? [] : zodErrorDetails(result.error),
         };
     }
 

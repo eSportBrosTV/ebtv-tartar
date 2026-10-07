@@ -47,9 +47,9 @@ class DockerProvider extends ProviderService {
 
     async createContainer({ tartarToken, disToken, botId, version = 'latest' }) {
         try {
-            const imageToUse = this.#env === "dev" ? "node:20-alpine" : this.#getImageName(version);
+            const imageToUse = this.#env === "dev" ? "node:22-alpine" : this.#getImageName(version);
             const binds = this.#env === "dev" ? [`${process.env.LOCAL_BOT_PATH}:/app`] : [];
-            const cmd = this.#env === "dev" ? ["sh", "-c", "npm install && node src/server.js"] : undefined;
+            const cmd = this.#env === "dev" ? ["sh", "-c", "npm install && node start.js"] : undefined;
             const managerURL = this.#env === "prod" ? process.env.MANAGER_PUBLIC_URL : "http://host.docker.internal:3000";
 
             this._logInfo(`Creation du conteneur ${this.#containerName(botId)}`);

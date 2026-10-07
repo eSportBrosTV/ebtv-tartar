@@ -4,6 +4,7 @@ const { validateBody, injectCtx, authorize } = require("../../middlewares");
 const { Bot } = require("../../models");
 
 const botCommandsRouter = require("./_idbot.commands.routes");
+const botPlatformRouter = require("./_idbot.platform.routes");
 
 const schemas = require("../../schemas");
 const policies = require("../../policies");
@@ -31,5 +32,6 @@ botRouter.post("/kill", authorize(policies.orga.hasRole(["owner"], (req) => req.
 botRouter.post("/update", authorize(policies.orga.hasRole(["owner"], (req) => req.ctx.bot.orga)), botCtrl.updateImageBot)
 
 botRouter.use("/commands", botCommandsRouter)
+botRouter.use("/platform", botPlatformRouter)
 
 module.exports = botRouter

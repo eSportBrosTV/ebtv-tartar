@@ -9,6 +9,7 @@ const ReleaseDataService = require("./data/ReleaseDataService");
 const BotAuthService = require("./domain/bot/BotAuthService");
 const BotCommandService = require("./domain/bot/BotCommandService");
 const BotConfigService = require("./domain/bot/BotConfigService");
+const BotPlatformService = require("./domain/bot/BotPlatformService");
 
 const BotDeploymentService = require("./domain/bot/BotDeploymentService");
 const BotLifecycleService = require("./domain/bot/BotLifecycleService");
@@ -48,6 +49,7 @@ const botDeployment = new BotDeploymentService(botData, releaseData, botAuth, do
 const botManagement = new BotManagementService(botData, botConfig, socketProvider)
 const botCommand = new BotCommandService(botCommandData, commandData, botConfig, socketProvider)
 const botPresence = new BotPresenceService(botData, socketProvider)
+const botPlatform = new BotPlatformService(botData, botConfig, socketProvider)
 
 const botLifecycle = new BotLifecycleService(botManagement, botDeployment)
 
@@ -70,7 +72,8 @@ const botService = {
     commands: botCommand,
     lifecycle: botLifecycle,
     auth: botAuth,
-    presence: botPresence
+    presence: botPresence,
+    platform: botPlatform
 }
 
 const userService = {

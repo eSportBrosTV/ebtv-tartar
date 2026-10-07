@@ -50,6 +50,21 @@ const botSchema = new mongoose.Schema({
   lastErrorMessage: {
     type: String,
     default: null
+  },
+  platform: {
+    id: {
+      type: String,
+      default: null
+    },
+    params: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {}
+    },
+    secrets: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+      select: false
+    }
   }
 });
 
